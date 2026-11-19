@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% from "_macros.html" import rp, status %}
+{% block title %}Dashboard Pengguna{% endblock %}
+
+{% block content %}
+<div class="user-dashboard">
+  <h1>Halo, {{ user.name }}!</h1>
+  <p class="mut">Selamat datang di akun shop id Anda. Kelola pesanan, profil, dan informasi belanja Anda di sini.</p>
+
+  <div class="chips" style="margin:20px 0">
+    <a class="chip" href="/orders/my">📦 Riwayat Pesanan</a>
+    <a class="chip" href="/profile">👤 Ubah Profil</a>
+    <a class="chip" href="/cart">🛒 Keranjang Belanja</a>
+    <a class="chip" href="/wishlist">❤️ Wishlist</a>
+    <a class="chip" href="/products">🔍 Belanja Produk</a>
+  </div>
+
+<div class="two">
+  <div>
+    <h2>Pesanan Terbaru</h2>
+    <div class="card scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>No. Order</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Pembayaran</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in recent_orders %}
+          <tr>
+            <td><strong>{{ o.order_number }}</strong></td>
+            <td>{{ rp(o.total) }}</td>
+            <td>{{ status(o.order_status) }}</td>
+            <td>{{ status(o.payment_status) }}</td>
+            <td><a class="btn sm ghost" href="/orders/{{ o._id }}">Detail</a></td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="mut">Belum ada pesanan terbaru. <a href="/products">Mulai belanja</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div>
+    <h2>Informasi Akun</h2>
+    <div class="card">
+      <p><strong>Nama:</strong> {{ user.name }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>Telepon:</strong> {{ user.phone or '-' }}</p>
+      <p><strong>Alamat:</strong> {{ user.address or '-' }}</p>
+      <p style="margin-top:16px"><a class="btn sm" href="/profile">Edit Profil</a></p>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}
+

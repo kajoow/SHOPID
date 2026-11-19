@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% from "_macros.html" import rp %}
+{% block title %}Keranjang{% endblock %}
+
+{% block content %}
+<div class="market-page cart-page">
+  <div class="market-breadcrumb"><a href="/">Beranda</a><span aria-hidden="true">/</span><span>Keranjang</span></div>
+  <header class="market-page-heading">
+    <div>
+      <span class="eyebrow">Hampir jadi milikmu</span>
+      <h1>Keranjang belanja</h1>
+      <p class="mut">Periksa pilihanmu sebelum lanjut ke pembayaran.</p>
+    </div>
+    <a class="text-link" href="/products">← Lanjut belanja</a>
+  </header>
+
+  {% if items %}
+  <div class="cart-layout">
+    <section class="cart-items card" aria-label="Produk di keranjang">
+      <div class="cart-list-header"><strong>Produk yang dipilih</strong><span class="mut">{{ items|length }} item</span></div>
+      {% for i in items %}
+      <article class="cart-item">
+        <a class="cart-product-image" href="/products/{{ i.product._id }}">
+          {% if i.product.image_url %}
+          <img src="{{ i.product.image_url }}" alt="{{ i.product.name }}" loading="lazy">
+          {% else %}
+          <img class="product-illustration" src="{{ i.product.name|product_visual }}" alt="{{ i.product.name }}" loading="lazy">
+          {% endif %}
+        </a>
+        <div class="cart-product-info">
+          <a href="/products/{{ i.product._id }}"><strong>{{ i.product.name }}</strong></a>
+          <span class="mut">Harga satuan {{ rp(i.product.price) }}</span>
+          <button class="cart-remove" type="button" data-act="del" data-id="{{ i.product._id }}">Hapus</button>
+        </div>
+        <div class="qty cart-qty" aria-label="Jumlah {{ i.product.name }}">
+          <button class="btn sm ghost" type="button" data-act="qty" data-id="{{ i.product._id }}" data-q="{{ i.quantity-1 }}" {{ 'disabled' if i.quantity <= 1 }} aria-label="Kurangi jumlah">−</button>
+          <span>{{ i.quantity }}</span>
+          <button class="btn sm ghost" type="button" data-act="qty" data-id="{{ i.product._id }}" data-q="{{ i.quantity+1 }}" aria-label="Tambah jumlah">+</button>
+        </div>
+        <strong class="cart-line-total">{{ rp(i.line_total) }}</strong>
+      </article>
+      {% endfor %}
+      <a class="cart-continue" href="/products">← Tambah produk lainnya</a>
+    </section>
+
+    <aside class="cart-summary card">
+      <h2>Ringkasan belanja</h2>
+      <div><span>Subtotal produk</span><strong>{{ rp(subtotal) }}</strong></div>
+      <div class="cart-summary-total"><span>Total sementara</span><strong>{{ rp(subtotal) }}</strong></div>
+      <p class="mut">Biaya pengiriman dan diskon akan dihitung saat checkout.</p>
+      <a class="btn cart-checkout" href="/checkout">Lanjut ke checkout <span aria-hidden="true">→</span></a>
+      <div class="cart-safe-note">Pastikan detail pesanan sesuai sebelum lanjut ke pembayaran.</div>
+    </aside>
+  </div>
+  {% else %}
+  <div class="market-empty card">
+    <span class="empty-icon" aria-hidden="true">🛒</span>
+    <h2>Keranjangmu masih kosong</h2>
+    <p class="mut">Yuk, temukan produk yang kamu butuhkan dan tambahkan ke keranjang.</p>
+    <a href="/products" class="btn">Mulai belanja</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

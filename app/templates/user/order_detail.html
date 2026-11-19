@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% from "_macros.html" import rp, status %}
+{% block title %}{{ order.order_number }}{% endblock %}
+
+{% block content %}
+{% set flow = ['pending','confirmed','processing','ready_for_pickup','completed'] %}
+<div class="market-page order-detail-page">
+  <div class="market-breadcrumb"><a href="/">Beranda</a><span aria-hidden="true">/</span><a href="/orders/my">Pesanan</a><span aria-hidden="true">/</span><span>{{ order.order_number }}</span></div>
+  <header class="market-page-heading">
+    <div>
+      <span class="eyebrow">Rincian transaksi</span>
+      <h1>Detail pesanan</h1>
+      <p class="mut">Nomor pesanan <strong>{{ order.order_number }}</strong></p>
+    </div>
+    <a class="btn btn-outline" href="/orders/my">← Kembali ke pesanan</a>
+  </header>
+
+  <section class="order-progress-card card" aria-label="Status pesanan">
+    <div class="order-progress-heading">
+      <div><strong>Status pesanan</strong><span class="mut">Pantau proses pesananmu</span></div>
+      <div>{{ status(order.order_status) }}</div>
+    </div>
+    {% if order.order_status == 'cancelled' %}
+    <div class="flash error order-cancelled">Pesanan ini telah dibatalkan.</div>
+    {% else %}
+    <div class="order-progress">
+      {% for step in flow %}
+      <div class="order-progress-step {{ 'is-done' if flow.index(step) <= flow.index(order.order_status) }}">
+        <span>{{ loop.index }}</span>
+        <strong>{{ step.replace('_',' ') }}</strong>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </section>
+
+  <div class="order-detail-layout">
+    <section class="order-detail-items card">
+      <div class="order-detail-section-heading"><strong>Produk dalam pesanan</strong><span class="mut">{{ order['items']|length }} produk</span></div>
+      {% for item in order['items'] %}
+      <article class="order-detail-item">
+        <span class="order-product-icon" aria-hidden="true">▦</span>
+        <div class="order-detail-product">
+          <strong>{{ item.name }}</strong>
+          <span class="mut">{{ item.quantity }} × {{ rp(item.unit_price) }}</span>
+        </div>
+        <strong class="order-detail-line-total">{{ rp(item.line_total) }}</strong>
+      </article>
+      {% endfor %}
+      <div class="order-detail-meta">
+        <div><span class="mut">Metode pembayaran</span><strong>{{ order.payment_method.replace('_',' ') }}</strong></div>
+        <div><span class="mut">Metode penerimaan</span><strong>{{ order.fulfillment_method.replace('_',' ') }}</strong></div>
+        {% if order.fulfillment_method == 'delivery' and order.shipping_address %}
+        <div class="order-address"><span class="mut">Alamat pengiriman</span><strong>{{ order.shipping_address.line }}</strong></div>
+        {% endif %}
+      </div>
+    </section>
+
+    <aside class="order-detail-summary card">
+      <h2>Ringkasan pembayaran</h2>
+      <div><span>Subtotal</span><span>{{ rp(order.subtotal) }}</span></div>
+      <div><span>Diskon</span><span>-{{ rp(order.discount) }}</span></div>
+      <div><span>Ongkos kirim</span><span>{{ rp(order.delivery_fee) }}</span></div>
+      <div class="order-detail-total"><strong>Total pembayaran</strong><strong>{{ rp(order.total) }}</strong></div>
+      <div class="order-payment-status"><span class="mut">Status pembayaran</span>{{ status(order.payment_status) }}</div>
+
+      {% if order.payment_method == 'bank_transfer' and order.payment_status in ['unpaid','failed'] %}
+      <form class="order-payment-form" method="post" action="/orders/{{ order._id }}/payment-proof" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+        <label for="proof">Unggah bukti transfer <span class="mut">(JPG/PNG, maks. 2 MB)</span></label>
+        <input id="proof" name="proof" type="file" accept="image/png,image/jpeg">
+        <button class="btn" type="submit">Kirim bukti pembayaran</button>
+      </form>
+      {% endif %}
+      {% if order.order_status == 'pending' %}
+      <form class="order-cancel-form" method="post" action="/orders/{{ order._id }}/cancel">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+        <button class="btn danger" type="submit">Batalkan pesanan</button>
+      </form>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}

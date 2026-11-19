@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+  <defs><linearGradient id="carton" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fffef9"/><stop offset="1" stop-color="#dfe9d7"/></linearGradient></defs>
+  <ellipse cx="160" cy="211" rx="76" ry="12" fill="#204b3a" opacity=".12"/>
+  <path d="m108 60 33-27h68l16 27v141H108z" fill="url(#carton)" stroke="#486c50" stroke-width="4" stroke-linejoin="round"/>
+  <path d="m141 33 4 28h80l-16-28z" fill="#e5d4aa"/>
+  <path d="M108 92h117v52H108z" fill="#1f5a46"/>
+  <path d="M139 166q21-29 42 0-21 25-42 0" fill="#fffdf3"/>
+  <text x="166" y="115" fill="#fffdf3" font-family="Arial,sans-serif" font-size="13" font-weight="700" text-anchor="middle">SUSU UHT</text>
+  <text x="166" y="131" fill="#e7eddf" font-family="Arial,sans-serif" font-size="9" text-anchor="middle">1 LITER</text>
+</svg>

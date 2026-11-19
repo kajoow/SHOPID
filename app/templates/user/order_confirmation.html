@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% from "_macros.html" import rp, status %}
+{% block title %}Konfirmasi Pesanan {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:700px;margin:32px auto;text-align:center">
+  <div style="font-size:56px;line-height:1;margin-bottom:12px">🎉</div>
+  <h1 style="margin:0 0 8px">Pesanan Berhasil Dibuat!</h1>
+  <p class="mut">Nomor Pesanan: <strong>{{ order.order_number }}</strong></p>
+
+  <div class="flash" style="text-align:left;margin:24px 0">
+    <h3 style="margin:0 0 8px">Petunjuk Pembayaran & Pengambilan:</h3>
+    {% if order.payment_method == 'bank_transfer' %}
+    <p>Silakan lakukan transfer sebesar <strong>{{ rp(order.total) }}</strong> ke rekening berikut:</p>
+    <p style="background:var(--card,#fff);padding:10px 14px;border-radius:6px;border:1px dashed var(--line);font-family:monospace;font-size:16px">
+      <strong>Bank Mandiri: 123-456-7890</strong><br>
+      Atas Nama: <strong>PT shop id Indonesia</strong>
+    </p>
+    <p class="mut">Setelah transfer, unggah bukti bayar di halaman detail pesanan.</p>
+    {% else %}
+    <p>Pesanan Anda menggunakan <strong>Bayar di Tempat (Cash on Delivery)</strong>. Siapkan uang pas sebesar <strong>{{ rp(order.total) }}</strong> saat serah terima pesanan.</p>
+    {% endif %}
+
+    {% if order.fulfillment_method == 'pickup' %}
+    <p style="margin-top:12px">📍 <strong>Ambil di Toko:</strong> Anda dapat mengambil pesanan di kasir toko saat status berubah menjadi <em>Siap Diambil</em> (Jam Operasional: 08:00 - 21:00 WIB).</p>
+    {% else %}
+    <p style="margin-top:12px">🚚 <strong>Alamat Pengiriman:</strong> {{ order.shipping_address.line if order.shipping_address else '-' }}</p>
+    {% endif %}
+  </div>
+
+  <div class="card sum" style="text-align:left;margin-bottom:24px">
+    <h3 style="margin-top:0">Ringkasan Pesanan</h3>
+    {% for item in order['items'] %}
+    <div>
+      <span>{{ item.name }} x{{ item.quantity }}</span>
+      <span>{{ rp(item.line_total) }}</span>
+    </div>
+    {% endfor %}
+    <div><span>Subtotal</span><span>{{ rp(order.subtotal) }}</span></div>
+    {% if order.discount > 0 %}
+    <div><span>Diskon ({{ order.voucher_code }})</span><span>-{{ rp(order.discount) }}</span></div>
+    {% endif %}
+    <div><span>Biaya Pengiriman</span><span>{{ rp(order.delivery_fee) }}</span></div>
+    <div class="tot"><span>Total Pembayaran</span><span>{{ rp(order.total) }}</span></div>
+  </div>
+
+  <p>
+    <a class="btn" href="/orders/{{ order._id }}">Lihat Detail & Lacak Pesanan</a>
+    <a class="btn ghost" href="/products" style="margin-left:8px">Lanjut Belanja</a>
+  </p>
+</div>
+{% endblock %}

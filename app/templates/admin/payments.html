@@ -1,0 +1,79 @@
+{% extends "admin_base.html" %}
+{% from "_macros.html" import rp, status %}
+{% block title %}Antrean Verifikasi Pembayaran - Admin{% endblock %}
+
+{% block admin %}
+<div class="row">
+  <h1 style="margin:0">Verifikasi Pembayaran</h1>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <form method="get" action="/admin/payments" class="row" style="gap:12px">
+    <div>
+      <label for="payment_status">Status Pembayaran</label>
+      <select id="payment_status" name="payment_status">
+        <option value="awaiting_verification" {% if payment_status == 'awaiting_verification' %}selected{% endif %}>Perlu Verifikasi (Awaiting Verification)</option>
+        <option value="paid" {% if payment_status == 'paid' %}selected{% endif %}>Lunas (Paid)</option>
+        <option value="failed" {% if payment_status == 'failed' %}selected{% endif %}>Ditolak (Failed)</option>
+        <option value="unpaid" {% if payment_status == 'unpaid' %}selected{% endif %}>Belum Bayar (Unpaid)</option>
+      </select>
+    </div>
+    <div style="align-self:flex-end">
+      <button type="submit" class="btn">Tampilkan</button>
+    </div>
+  </form>
+</div>
+
+<div class="card scroll" style="margin-top:16px">
+  <table>
+    <thead>
+      <tr>
+        <th>No. Order</th>
+        <th>Waktu</th>
+        <th>Penerima</th>
+        <th>Metode</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Bukti Transfer</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in orders %}
+      <tr>
+        <td><strong>{{ o.order_number }}</strong></td>
+        <td>{{ o.created_at|datetime if o.created_at else '-' }}</td>
+        <td>{{ o.contact.name }}</td>
+        <td>{{ o.payment_method }}</td>
+        <td><strong>{{ rp(o.total) }}</strong></td>
+        <td>{{ status(o.payment_status) }}</td>
+        <td>
+          {% if o.payment_proof %}
+          <a href="/orders/{{ o._id }}/payment-proof" target="_blank" class="btn sm ghost">Lihat Foto</a>
+          {% else %}
+          <span class="mut">-</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if o.payment_status == 'awaiting_verification' %}
+          <form method="post" action="/admin/orders/{{ o._id }}/payment" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+            <input type="hidden" name="action" value="verify">
+            <button class="btn sm">Verifikasi</button>
+          </form>
+          <a href="/admin/orders/{{ o._id }}" class="btn sm ghost danger">Tinjau/Tolak</a>
+          {% else %}
+          <a href="/admin/orders/{{ o._id }}" class="btn sm ghost">Detail</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="8" style="text-align:center;padding:24px">Tidak ada antrean pembayaran.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+

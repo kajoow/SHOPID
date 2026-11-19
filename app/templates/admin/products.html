@@ -1,0 +1,192 @@
+{% extends "admin_base.html" %}
+{% from "_macros.html" import rp, stock_tag, field %}
+{% block title %}Manajemen Produk{% endblock %}
+
+{% block admin %}
+<div class="row">
+  <h1 style="margin:0">Manajemen Produk</h1>
+  <button class="btn" onclick="openAddModal()">+ Tambah Produk</button>
+</div>
+
+<!-- Modal Tambah Produk -->
+<div id="modal-add" class="card" style="display:none;margin-top:16px;border:2px solid var(--g)">
+  <div class="row">
+    <h2 style="margin:0">Tambah Produk Baru</h2>
+    <button class="btn sm ghost" onclick="document.getElementById('modal-add').style.display='none'">✕ Tutup</button>
+  </div>
+  <form method="post" action="/admin/products" enctype="multipart/form-data" style="margin-top:12px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+    <div class="two">
+      <div>
+        {{ field('sku', 'SKU (Kode Unik)', value='') }}
+        {{ field('name', 'Nama Produk', value='') }}
+        <label for="category_id">Kategori</label>
+        <select id="category_id" name="category_id" required>
+          <option value="">Pilih Kategori</option>
+          {% for c in categories %}
+          <option value="{{ c._id }}">{{ c.name }}</option>
+          {% endfor %}
+        </select>
+        <label for="description">Deskripsi</label>
+        <textarea id="description" name="description" rows="3"></textarea>
+      </div>
+      <div>
+        {{ field('price', 'Harga Satuan (Rp)', type='number', value='') }}
+        {{ field('stock', 'Stok Awal', type='number', value='0') }}
+        {{ field('min_stock', 'Stok Minimum (Ambang Batas)', type='number', value='5') }}
+        <label for="image">Foto Produk (JPG/PNG, maks 2 MB)</label>
+        <input id="image" name="image" type="file" accept="image/png,image/jpeg">
+      </div>
+    </div>
+    <p style="margin-top:16px">
+      <button type="submit" class="btn">Simpan Produk</button>
+    </p>
+  </form>
+</div>
+
+<!-- Modal Edit Produk -->
+<div id="modal-edit" class="card" style="display:none;margin-top:16px;border:2px solid var(--navy)">
+  <div class="row">
+    <h2 style="margin:0">Edit Data Produk</h2>
+    <button class="btn sm ghost" onclick="document.getElementById('modal-edit').style.display='none'">✕ Tutup</button>
+  </div>
+  <form id="form-edit-prod" method="post" action="" enctype="multipart/form-data" style="margin-top:12px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+    <div class="two">
+      <div>
+        <label for="edit-sku">SKU (Kode Unik - tidak dapat diubah)</label>
+        <input id="edit-sku" type="text" readonly disabled style="background:var(--bg);color:var(--mut)">
+
+        <label for="edit-name">Nama Produk</label>
+        <input id="edit-name" name="name" type="text" required>
+
+        <label for="edit-category_id">Kategori</label>
+        <select id="edit-category_id" name="category_id" required>
+          <option value="">Pilih Kategori</option>
+          {% for c in categories %}
+          <option value="{{ c._id }}">{{ c.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="edit-description">Deskripsi</label>
+        <textarea id="edit-description" name="description" rows="3"></textarea>
+      </div>
+      <div>
+        <label for="edit-price">Harga Satuan (Rp)</label>
+        <input id="edit-price" name="price" type="number" min="1" required>
+
+        <label for="edit-min_stock">Stok Minimum (Ambang Batas)</label>
+        <input id="edit-min_stock" name="min_stock" type="number" min="0" required>
+
+        <div style="background:var(--gl);padding:8px 12px;border-radius:6px;margin-top:12px">
+          <small style="color:var(--g2)">ℹ️ Jumlah stok produk tidak diubah di sini. Gunakan menu <a href="/admin/inventory" style="font-weight:700">Inventori</a> untuk penyesuaian stok.</small>
+        </div>
+
+        <label for="edit-image" style="margin-top:12px">Ganti Foto Produk (opsional, maks 2 MB)</label>
+        <input id="edit-image" name="image" type="file" accept="image/png,image/jpeg">
+      </div>
+    </div>
+    <p style="margin-top:16px;display:flex;gap:8px">
+      <button type="submit" class="btn">Simpan Perubahan</button>
+      <button type="button" class="btn ghost" onclick="document.getElementById('modal-edit').style.display='none'">Batal</button>
+    </p>
+  </form>
+</div>
+
+<div class="card scroll" style="margin-top:16px">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:50px">Foto</th>
+        <th>SKU</th>
+        <th>Nama Produk</th>
+        <th>Kategori</th>
+        <th>Harga</th>
+        <th>Stok</th>
+        <th>Status</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in products %}
+      <tr>
+        <td>
+          {% if p.image_url %}
+          <img src="{{ p.image_url }}" alt="{{ p.name }}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;display:block">
+          {% else %}
+          <div style="width:40px;height:40px;background:var(--gl);border-radius:4px;display:grid;place-items:center;font-weight:700;font-size:12px;color:var(--g)">{{ p.name[:2] }}</div>
+          {% endif %}
+        </td>
+        <td><code>{{ p.sku }}</code></td>
+        <td><strong>{{ p.name }}</strong></td>
+        <td>{{ p.category_name }}</td>
+        <td>{{ rp(p.price) }}</td>
+        <td>{{ p.stock }} (min {{ p.min_stock }})</td>
+        <td>
+          {% if p.is_active %}
+          <span class="tag">Aktif</span>
+          {% else %}
+          <span class="tag bad">Nonaktif</span>
+          {% endif %}
+        </td>
+        <td>
+          <div style="display:flex;gap:4px">
+            <button class="btn sm ghost"
+              data-id="{{ p._id }}"
+              data-sku="{{ p.sku }}"
+              data-name="{{ p.name }}"
+              data-category="{{ p.category_id }}"
+              data-price="{{ p.price }}"
+              data-minstock="{{ p.min_stock }}"
+              data-description="{{ p.description or '' }}"
+              onclick="openEditModal(this)">Edit</button>
+            {% if p.is_active %}
+            <button class="btn sm danger" onclick="deactivateProd('{{ p._id }}')">Nonaktifkan</button>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="8">Belum ada produk.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+function openAddModal() {
+  document.getElementById('modal-edit').style.display = 'none';
+  const m = document.getElementById('modal-add');
+  m.style.display = m.style.display === 'none' ? 'block' : 'none';
+  if (m.style.display === 'block') m.scrollIntoView({ behavior: 'smooth' });
+}
+
+function openEditModal(btn) {
+  const d = btn.dataset;
+  document.getElementById('form-edit-prod').action = '/admin/products/' + d.id;
+  document.getElementById('edit-sku').value = d.sku || '';
+  document.getElementById('edit-name').value = d.name || '';
+  document.getElementById('edit-category_id').value = d.category || '';
+  document.getElementById('edit-price').value = d.price || '';
+  document.getElementById('edit-min_stock').value = d.minstock || '0';
+  document.getElementById('edit-description').value = d.description || '';
+  document.getElementById('modal-add').style.display = 'none';
+  const me = document.getElementById('modal-edit');
+  me.style.display = 'block';
+  me.scrollIntoView({ behavior: 'smooth' });
+}
+
+async function deactivateProd(id) {
+  if (!confirm('Yakin ingin menonaktifkan produk ini? Produk tidak akan muncul di katalog pelanggan.')) return;
+  try {
+    await api('DELETE', '/admin/products/' + id);
+    toast('Produk dinonaktifkan');
+    location.reload();
+  } catch (err) {
+    toast(err.message);
+  }
+}
+</script>
+{% endblock %}

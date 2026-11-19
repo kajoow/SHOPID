@@ -1,0 +1,102 @@
+{% extends "admin_base.html" %}
+{% block title %}Manajemen Pengguna{% endblock %}
+
+{% block admin %}
+<div class="row">
+  <h1 style="margin:0">Manajemen Pengguna</h1>
+  <span class="mut">{{ total }} pengguna</span>
+</div>
+
+<!-- Filter & Pencarian -->
+<div class="card" style="margin-top:16px">
+  <form method="get" action="/admin/users" class="row" style="gap:12px;flex-wrap:wrap">
+    <input type="text" name="q" placeholder="Cari nama atau email..." value="{{ q }}" style="flex:1;min-width:200px">
+    <select name="role" style="width:auto">
+      <option value="">Semua Role</option>
+      <option value="admin" {{ 'selected' if role=='admin' }}>Admin</option>
+      <option value="user" {{ 'selected' if role=='user' }}>User</option>
+    </select>
+    <button type="submit" class="btn sm">Cari</button>
+    {% if q or role %}
+    <a href="/admin/users" class="btn sm ghost">Reset</a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="card scroll" style="margin-top:16px">
+  <table>
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Tanggal Daftar</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td><strong>{{ u.name }}</strong></td>
+        <td>{{ u.email }}</td>
+        <td>
+          {% if u.role == 'admin' %}
+          <span class="tag">Admin</span>
+          {% else %}
+          <span class="tag" style="background:var(--bg2)">User</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if u.is_active %}
+          <span class="tag">Aktif</span>
+          {% else %}
+          <span class="tag bad">Nonaktif</span>
+          {% endif %}
+        </td>
+        <td>{{ u.created_at.strftime('%d/%m/%Y') if u.created_at else '-' }}</td>
+        <td>
+          {% if u.is_active %}
+          <button class="btn sm danger" onclick="toggleUser('{{ u._id }}', false)">Nonaktifkan</button>
+          {% else %}
+          <button class="btn sm" onclick="toggleUser('{{ u._id }}', true)">Aktifkan</button>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="6">Tidak ada pengguna ditemukan.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+{% if total_pages > 1 %}
+<div class="row" style="margin-top:16px;justify-content:center;gap:8px">
+  {% if page > 1 %}
+  <a href="?q={{ q }}&role={{ role }}&page={{ page - 1 }}" class="btn sm ghost">← Sebelumnya</a>
+  {% endif %}
+  <span class="mut">Halaman {{ page }} dari {{ total_pages }}</span>
+  {% if page < total_pages %}
+  <a href="?q={{ q }}&role={{ role }}&page={{ page + 1 }}" class="btn sm ghost">Berikutnya →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+<script>
+async function toggleUser(id, activate) {
+  const label = activate ? 'mengaktifkan' : 'menonaktifkan';
+  if (!confirm('Yakin ingin ' + label + ' pengguna ini?')) return;
+  try {
+    await api('PATCH', '/admin/users/' + id, { is_active: activate });
+    toast('Pengguna berhasil di' + (activate ? 'aktifkan' : 'nonaktifkan'));
+    location.reload();
+  } catch (err) {
+    toast(err.message);
+  }
+}
+</script>
+{% endblock %}
+

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% from "_macros.html" import rp %}
+{% block title %}Wishlist Saya{% endblock %}
+
+{% block content %}
+<div class="market-page wishlist-page">
+  <div class="market-breadcrumb"><a href="/">Beranda</a><span aria-hidden="true">/</span><span>Wishlist</span></div>
+  <header class="market-page-heading">
+    <div>
+      <span class="eyebrow">Simpan untuk nanti</span>
+      <h1>Wishlist saya</h1>
+      <p class="mut">Produk favoritmu, siap ditemukan kembali.</p>
+    </div>
+    <a class="btn btn-outline" href="/products">Jelajahi produk <span aria-hidden="true">→</span></a>
+  </header>
+
+  {% if products %}
+  <div class="market-list-heading"><strong>Produk tersimpan</strong><span class="mut">{{ products|length }} produk</span></div>
+  <div class="grid wishlist-grid" id="wishlist-grid">
+    {% for p in products %}
+    <article class="card pc wishlist-card" id="wishlist-item-{{ p._id }}">
+      <a class="wishlist-image" href="/products/{{ p._id }}">
+        {% if p.image_url %}
+        <img src="{{ p.image_url }}" alt="{{ p.name }}" loading="lazy">
+        {% else %}
+        <img class="product-illustration" src="{{ p.name|product_visual }}" alt="{{ p.name }}" loading="lazy">
+        {% endif %}
+      </a>
+      <a class="wishlist-name" href="/products/{{ p._id }}"><strong>{{ p.name }}</strong></a>
+      <span class="price">{{ rp(p.price) }}</span>
+      <div class="wishlist-actions">
+        <button class="btn sm" data-act="add" data-id="{{ p._id }}" {% if p.stock == 0 %}disabled{% endif %}>{% if p.stock == 0 %}Tidak tersedia{% else %}+ Keranjang{% endif %}</button>
+        <button class="wishlist-remove" type="button" onclick="removeFromWishlist('{{ p._id }}', this)" aria-label="Hapus {{ p.name }} dari wishlist">Hapus</button>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="market-empty card">
+    <span class="empty-icon" aria-hidden="true">♡</span>
+    <h2>Wishlist-mu masih kosong</h2>
+    <p class="mut">Simpan produk yang kamu suka agar mudah ditemukan lagi.</p>
+    <a href="/products" class="btn">Jelajahi katalog</a>
+  </div>
+  {% endif %}
+  <div class="market-empty card" id="wishlist-empty" hidden>
+    <span class="empty-icon" aria-hidden="true">♡</span>
+    <h2>Wishlist-mu masih kosong</h2>
+    <p class="mut">Simpan produk yang kamu suka agar mudah ditemukan lagi.</p>
+    <a href="/products" class="btn">Jelajahi katalog</a>
+  </div>
+</div>
+
+<script>
+async function removeFromWishlist(id, button) {
+  button.disabled = true;
+  try {
+    const response = await fetch('/wishlist/items/' + encodeURIComponent(id), {
+      method: 'DELETE',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}',
+        'Accept': 'application/json'
+      }
+    });
+    const data = await response.json();
+    if (!response.ok || !data.ok) throw new Error(data.error?.message || 'Produk tidak dapat dihapus.');
+    const item = document.getElementById('wishlist-item-' + id);
+    if (item) item.remove();
+    const grid = document.getElementById('wishlist-grid');
+    if (grid && !grid.children.length) {
+      grid.hidden = true;
+      document.querySelector('.market-list-heading').hidden = true;
+      document.getElementById('wishlist-empty').hidden = false;
+    }
+    toast('Produk dihapus dari wishlist');
+  } catch (error) {
+    button.disabled = false;
+    toast(error.message || 'Produk tidak dapat dihapus.');
+  }
+}
+</script>
+{% endblock %}

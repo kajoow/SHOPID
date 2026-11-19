@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+  <defs><linearGradient id="bottle" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#dce8b6"/><stop offset="1" stop-color="#8eb773"/></linearGradient></defs>
+  <ellipse cx="160" cy="211" rx="71" ry="12" fill="#204b3a" opacity=".12"/>
+  <path d="M138 51h42v22q18 9 21 29l8 97q1 13-13 13h-74q-14 0-13-13l8-97q3-20 21-29z" fill="url(#bottle)" stroke="#4b7446" stroke-width="4"/>
+  <path d="M144 38h38v17h-38z" fill="#d9785e"/>
+  <path d="M119 111h82v50h-82z" fill="#fffdf3"/>
+  <path d="M143 148q-7-18 10-28 15 10 10 28-10 13-20 0" fill="#70a55b"/>
+  <text x="160" y="126" fill="#28523b" font-family="Arial,sans-serif" font-size="9" font-weight="700" text-anchor="middle">CUCI PIRING</text>
+  <text x="160" y="177" fill="#fffdf3" font-family="Arial,sans-serif" font-size="9" font-weight="700" text-anchor="middle">700 ml</text>
+</svg>

@@ -1,0 +1,89 @@
+{% extends "admin_base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}Manajemen Kategori{% endblock %}
+
+{% block admin %}
+<div class="row">
+  <h1 style="margin:0">Manajemen Kategori</h1>
+  <button class="btn" onclick="document.getElementById('modal-add-cat').style.display='block'">+ Tambah Kategori</button>
+</div>
+
+<!-- Modal Tambah Kategori -->
+<div id="modal-add-cat" class="card" style="display:none;margin-top:16px;border:2px solid var(--g)">
+  <div class="row">
+    <h2 style="margin:0">Tambah Kategori Baru</h2>
+    <button class="btn sm ghost" onclick="document.getElementById('modal-add-cat').style.display='none'">✕ Tutup</button>
+  </div>
+  <form method="post" action="/admin/categories" style="margin-top:12px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+    <div class="two">
+      <div>
+        {{ field('name', 'Nama Kategori') }}
+        {{ field('slug', 'Slug URL (contoh: makanan-ringan)') }}
+      </div>
+      <div>
+        <label for="description">Deskripsi</label>
+        <textarea id="description" name="description" rows="3"></textarea>
+      </div>
+    </div>
+    <p style="margin-top:16px">
+      <button type="submit" class="btn">Simpan Kategori</button>
+    </p>
+  </form>
+</div>
+
+<div class="card scroll" style="margin-top:16px">
+  <table>
+    <thead>
+      <tr>
+        <th>Nama Kategori</th>
+        <th>Slug</th>
+        <th>Deskripsi</th>
+        <th>Status</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in categories %}
+      <tr>
+        <td><strong>{{ c.name }}</strong></td>
+        <td><code>{{ c.slug }}</code></td>
+        <td>{{ c.description or '-' }}</td>
+        <td>
+          {% if c.is_active %}
+          <span class="tag">Aktif</span>
+          {% else %}
+          <span class="tag bad">Nonaktif</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if c.is_active %}
+          <button class="btn sm danger" onclick="deactivateCat('{{ c._id }}')">Nonaktifkan</button>
+          {% else %}
+          <span class="mut">-</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="5">Belum ada kategori.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+async function deactivateCat(id) {
+  if (!confirm('Yakin ingin menonaktifkan kategori ini?')) return;
+  try {
+    await api('DELETE', '/admin/categories/' + id);
+    toast('Kategori dinonaktifkan');
+    location.reload();
+  } catch (err) {
+    toast(err.message);
+  }
+}
+</script>
+{% endblock %}
+

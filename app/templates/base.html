@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() if csrf_token is defined else '' }}">
+    <meta name="theme-color" content="#fdfdfe">
+    <title>{% block title %}shop id{% endblock %} | shop id</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+  </head>
+  <body class="{% block body_class %}storefront-body{% endblock %}">
+    <a class="skip-link" href="#main-content">Lewati ke konten</a>
+    {% block site_header %}
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a class="logo" href="/" aria-label="shop id, beranda"><span>shop <b>id</b></span></a>
+        <nav class="nav-links" aria-label="Navigasi utama">
+          <a href="/">Beranda</a>
+          <a href="/#kategori">Kategori</a>
+          <a href="/#home-promotions">Promo</a>
+          {% if current_user is defined and current_user.is_authenticated %}
+          <a href="/orders/my">Pesanan</a>
+          {% endif %}
+        </nav>
+        <div class="nav-actions">
+          <details class="nav-search">
+            <summary class="nav-icon-link" aria-label="Buka pencarian" title="Cari produk">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="10.8" cy="10.8" r="6.4"></circle>
+                <path d="m15.5 15.5 4.2 4.2"></path>
+              </svg>
+            </summary>
+            <form class="site-search" action="/products" method="get" role="search">
+              <input name="q" placeholder="Cari produk atau SKU..." aria-label="Cari produk" value="{{ request.args.get('q', '') }}">
+              <button type="submit" aria-label="Cari">Cari</button>
+            </form>
+          </details>
+          <a class="nav-icon-link nav-cart" href="/cart" aria-label="Keranjang, {{ cart_count|default(0) }} item" title="Keranjang">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3.5 4.5h2l2.2 10.1a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.5l1.5-6.2H6.3"></path>
+              <circle cx="10" cy="20" r="1"></circle>
+              <circle cx="17.5" cy="20" r="1"></circle>
+            </svg>
+            <span class="badge-n">{{ cart_count|default(0) }}</span>
+          </a>
+          {% if current_user is defined and current_user.is_authenticated %}
+          <details class="nav-account-menu">
+            <summary class="nav-icon-link" aria-label="Menu akun {{ current_user.name }}" title="Akun">
+              <span class="nav-avatar" aria-hidden="true">{{ current_user.name[:1]|upper }}</span>
+            </summary>
+            <div class="nav-account-panel">
+              <div class="nav-account-intro">
+                <strong>{{ current_user.name }}</strong>
+                <span>Kelola akun shop id</span>
+              </div>
+              <a href="/profile">Profil saya</a>
+              <a href="/wishlist">Wishlist</a>
+              <a href="/notifications">Notifikasi</a>
+              <form action="/auth/logout" method="post" class="logout-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+                <button class="btn sm ghost" type="submit">Keluar</button>
+              </form>
+            </div>
+          </details>
+          {% else %}
+          <a class="nav-login" href="/auth/login">Masuk</a>
+          <a class="nav-register-link" href="/auth/register">Daftar</a>
+          {% endif %}
+          <a class="btn sm nav-shop-cta" href="/products" aria-label="Belanja sekarang" title="Belanja sekarang">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 8h14l1 12H4L5 8Z"></path>
+              <path d="M9 8V6a3 3 0 0 1 6 0v2"></path>
+            </svg>
+            <span class="nav-shop-label">Belanja sekarang</span>
+          </a>
+        </div>
+      </div>
+    </header>
+    {% endblock %}
+    {% block page_area %}
+    <main class="wrap" id="main-content">
+      {% with m = get_flashed_messages(with_categories=true) %}
+      {% for c, t in m %}<div class="flash {{ c }}" role="alert">{{ t }}</div>{% endfor %}
+      {% endwith %}
+      {% if error_message %}<div class="flash error" role="alert">{{ error_message }}</div>{% endif %}
+      {% block content %}{% endblock %}
+    </main>
+    {% endblock %}
+    {% block site_footer %}
+    <footer><span class="footer-brand">shop id</span><span>Belanja kebutuhan harian, lebih praktis.</span></footer>
+    {% endblock %}
+    <button class="scroll-top" type="button" aria-label="Kembali ke atas" hidden>↑</button>
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>

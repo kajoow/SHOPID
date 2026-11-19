@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% from "_macros.html" import pcard, rp %}
+{% block title %}Belanja Kebutuhan Harian{% endblock %}
+
+{% block content %}
+<section class="home-hero reveal">
+  <div class="home-hero-copy">
+    <span class="eyebrow">Belanja harian, lebih praktis</span>
+    <h1>Semua yang kamu butuhkan, <span>lebih dekat.</span></h1>
+    <p>Pilih kebutuhan favoritmu, pesan dari rumah, lalu tentukan cara menerima pesanan yang paling nyaman.</p>
+    <div class="hero-actions">
+      <a class="btn" href="/products">Mulai belanja <span aria-hidden="true">→</span></a>
+      <a class="hero-link" href="#kategori">Jelajahi kategori</a>
+    </div>
+    <div class="hero-perks" aria-label="Pilihan pembayaran dan pengambilan">
+      <span>Bayar di tempat</span>
+      <span>Ambil di toko</span>
+      <span>Pesan online</span>
+    </div>
+  </div>
+  <div class="hero-showcase" aria-label="Sorotan produk dari katalog toko">
+    <div class="showcase-intro">
+      <span class="tag">Katalog harian</span>
+      <h2>Temukan kebutuhan harian dalam satu tempat.</h2>
+      <p>Kebutuhan rumah, camilan, minuman, dan perawatan diri.</p>
+    </div>
+    <div class="showcase-products">
+      {% for p in products[:3] %}
+      <a class="showcase-product" href="/products/{{ p._id }}">
+        <span class="showcase-product-art">
+          <img class="{{ 'product-illustration' if not p.image_url }}" src="{{ p.image_url or (p.name|product_visual) }}" alt="" loading="lazy">
+          <span class="showcase-product-arrow" aria-hidden="true">↗</span>
+        </span>
+        <strong>{{ p.name }}</strong>
+        <span>{{ rp(p.price) }}</span>
+      </a>
+      {% else %}
+      <a class="showcase-empty" href="/products">Jelajahi semua produk <span aria-hidden="true">↗</span></a>
+      {% endfor %}
+    </div>
+    <div class="showcase-foot">
+      <span>Lihat semua produk</span>
+      <a href="/products">Buka katalog <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+  <span class="hero-cursor-glow" aria-hidden="true"><span class="hero-cursor-ring"></span></span>
+  <span class="hero-orb hero-orb-one" aria-hidden="true"></span>
+  <span class="hero-orb hero-orb-two" aria-hidden="true"></span>
+</section>
+
+{% if promotions %}
+<section class="home-promotions" id="home-promotions" aria-label="Promosi yang sedang berlaku">
+  <div class="promotion-rail-heading">
+    <span class="eyebrow">Voucher toko</span>
+    <a href="/products">Belanja produk <span aria-hidden="true">→</span></a>
+  </div>
+  <div class="promotion-marquee">
+    <div class="promotion-track">
+      {% for copy in range(3) %}
+      <div class="promotion-group" {% if not loop.first %}aria-hidden="true" inert{% endif %}>
+        {% for promo in promotions %}
+        <a class="promotion-panel" href="/products" aria-label="Gunakan voucher {{ promo.code }} saat checkout">
+          <span class="promotion-mark" aria-hidden="true">{% if promo.discount_type == 'percentage' %}%{% else %}−{% endif %}</span>
+          <span class="promotion-copy">
+            <span>Voucher {{ promo.code }}</span>
+            <strong>{% if promo.discount_type == 'percentage' %}Diskon {{ promo.value|int }}%{% else %}Hemat {{ rp(promo.value) }}{% endif %}</strong>
+            <small>
+              {% if promo.min_order %}Min. belanja {{ rp(promo.min_order) }} · {% endif %}
+              Berlaku sampai {{ promo.ends_at.strftime('%d %b %Y') }}
+            </small>
+          </span>
+          <span class="promotion-arrow" aria-hidden="true">↗</span>
+        </a>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="home-section home-products" data-home-discovery>
+  <div class="section-heading reveal">
+    <div><span class="eyebrow">Jelajahi koleksi</span><h2>Mulai dari yang kamu cari</h2><p class="mut">Pilih kategori untuk menyaring pilihan tanpa meninggalkan halaman.</p></div>
+    <a class="btn btn-outline" href="/products">Jelajahi katalog <span aria-hidden="true">→</span></a>
+  </div>
+  {% if products %}
+  <div class="home-discovery-toolbar" data-home-filter-controls hidden>
+    <div class="home-discovery-filters" role="group" aria-label="Filter pilihan produk">
+      <button class="home-discovery-filter is-active" type="button" data-home-filter="all" data-home-filter-label="Semua produk" aria-pressed="true">
+        Semua <span class="home-filter-count">{{ products|length }}</span>
+      </button>
+      {% for c in categories %}
+      {% set category_product_count = products|selectattr('category_slug', 'equalto', c.slug)|list|length %}
+      {% if category_product_count %}
+      <button class="home-discovery-filter" type="button" data-home-filter="{{ c.slug }}" data-home-filter-label="{{ c.name }}" aria-pressed="false">
+        {{ c.name }} <span class="home-filter-count">{{ category_product_count }}</span>
+      </button>
+      {% endif %}
+      {% endfor %}
+    </div>
+    <p class="home-discovery-status" data-home-filter-status role="status" aria-live="polite">{{ products|length }} produk ditampilkan</p>
+  </div>
+  <div class="grid" data-home-product-grid>{% for p in products %}{{ pcard(p, p.category_slug) }}{% endfor %}</div>
+  {% else %}
+  <div class="card home-empty-state">
+    <h3>Belum ada produk aktif</h3>
+    <p class="mut">Katalog toko belum memiliki produk yang dapat ditampilkan saat ini.</p>
+    <a class="text-link" href="#kategori">Jelajahi kategori <span aria-hidden="true">→</span></a>
+  </div>
+  {% endif %}
+</section>
+
+<section class="home-section home-categories" id="kategori">
+  <div class="section-heading reveal">
+    <div><span class="eyebrow">Jelajahi toko</span><h2>Belanja berdasarkan kategori</h2></div>
+    <a class="text-link" href="/products">Lihat semua produk <span aria-hidden="true">→</span></a>
+  </div>
+  <div class="category-grid">
+    {% for c in categories %}
+    <a class="category-card reveal" href="/products?category={{ c.slug }}">
+      <span class="category-icon" aria-hidden="true">{% if loop.index == 1 %}⌂{% elif loop.index == 2 %}☼{% elif loop.index == 3 %}◉{% else %}✿{% endif %}</span>
+      <strong>{{ c.name }}</strong>
+      <span class="category-arrow" aria-hidden="true">↗</span>
+    </a>
+    {% else %}
+    <a class="category-card reveal" href="/products">
+      <span class="category-icon" aria-hidden="true">⌕</span>
+      <strong>Semua produk</strong>
+      <span class="category-arrow" aria-hidden="true">↗</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+{% if recommendations %}
+<details class="popular-float" data-popular-float>
+  <summary class="popular-float-trigger">
+    <span class="popular-float-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M5 8h14l1 12H4L5 8Z"></path>
+        <path d="M9 8V6a3 3 0 0 1 6 0v2"></path>
+      </svg>
+    </span>
+    <span class="popular-float-trigger-copy">
+      <strong>Pilihan pelanggan</strong>
+      <small>{{ recommendations|length }} rekomendasi dari transaksi</small>
+    </span>
+    <span class="popular-float-chevron" aria-hidden="true">⌃</span>
+  </summary>
+  <section class="popular-float-panel" aria-label="Rekomendasi berdasarkan pembelian pelanggan">
+    <div class="popular-float-heading">
+      <div>
+        <span class="eyebrow">Rekomendasi toko</span>
+        <h2>Paling banyak dipilih</h2>
+      </div>
+      <button class="popular-float-close" type="button" data-popular-close aria-label="Tutup rekomendasi">×</button>
+    </div>
+    <p class="popular-float-description">Produk tersedia, diurutkan berdasarkan jumlah pembelian.</p>
+    <div class="popular-float-items">
+      {% for p in recommendations %}
+      <article class="popular-float-item">
+        <a class="popular-float-product" href="/products/{{ p._id }}">
+          <img src="{{ p.image_url or (p.name|product_visual) }}" alt="" loading="lazy">
+          <span>
+            <strong>{{ p.name }}</strong>
+            <small>{{ rp(p.price) }}</small>
+          </span>
+        </a>
+        <button class="popular-float-add" type="button" data-act="add" data-id="{{ p._id }}" aria-label="Tambah {{ p.name }} ke keranjang">Tambah</button>
+      </article>
+      {% endfor %}
+    </div>
+    <a class="popular-float-browse" href="/products?sort=popular">Jelajahi katalog <span aria-hidden="true">→</span></a>
+  </section>
+</details>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,4 @@
+{# Template generik untuk halaman admin berbasis tabel. TODO(Copilot): buat salinan per modul (produk, order, dst.) sesuai Bab 15 blueprint. #}
+{% extends "admin_base.html" %}{% block title %}{{ title }}{% endblock %}{% block admin %}
+<div class="row"><h1 style="margin:0">{{ title }}</h1>{% if add_label %}<a class="btn" href="#">{{ add_label }}</a>{% endif %}</div><div class="card scroll" style="margin-top:16px"><table><thead><tr>{% for c in columns %}<th>{{ c }}</th>{% endfor %}</tr></thead><tbody>
+{% for r in rows %}<tr>{% for v in r %}<td>{{ v }}</td>{% endfor %}</tr>{% else %}<tr><td colspan="{{ columns|length }}">Belum ada data.</td></tr>{% endfor %}</tbody></table></div>{% endblock %}

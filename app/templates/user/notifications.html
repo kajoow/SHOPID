@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Notifikasi{% endblock %}
+
+{% block content %}
+<div class="user-notifications">
+  <div class="row">
+    <h1 style="margin:0">Notifikasi</h1>
+    {% if unread_count > 0 %}
+    <button class="btn sm ghost" onclick="markAllRead()">Tandai Semua Dibaca</button>
+    {% endif %}
+  </div>
+
+<div class="card" style="margin-top:16px">
+  {% for n in notifications %}
+  <div class="notification-item">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <strong>{{ n.title }}</strong>
+        {% if not n.is_read %}
+        <span class="tag info sm">Baru</span>
+        {% endif %}
+      </div>
+      <p style="margin:4px 0">{{ n.message }}</p>
+      <span class="mut" style="font-size:0.85em">{{ n.created_at|datetime if n.created_at else '' }}</span>
+    </div>
+    {% if not n.is_read %}
+    <button class="btn sm ghost" onclick="markRead('{{ n._id }}')">Tandai Dibaca</button>
+    {% endif %}
+  </div>
+  {% else %}
+  <p class="mut" style="text-align:center;padding:24px">Belum ada notifikasi.</p>
+  {% endfor %}
+</div>
+
+<script>
+function markRead(id) {
+  fetch('/notifications/' + id + '/read', {
+    method: 'PATCH',
+    headers: {
+      'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}',
+      'Accept': 'application/json'
+    }
+  }).then(r => r.json()).then(data => {
+    if (data.ok) location.reload();
+  });
+}
+
+function markAllRead() {
+  fetch('/notifications/read-all', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}',
+      'Accept': 'application/json'
+    }
+  }).then(r => r.json()).then(data => {
+    if (data.ok) location.reload();
+  });
+}
+</script>
+</div>
+{% endblock %}
+

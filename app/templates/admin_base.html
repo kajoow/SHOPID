@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block body_class %}admin-body{% endblock %}
+
+{% block site_header %}
+<header class="admin-topbar">
+  <a class="admin-brand" href="/admin/dashboard" aria-label="shop id admin dashboard">
+    <span class="admin-brand-mark" aria-hidden="true">S</span>
+    <span>shop <b>id</b><small>ADMIN</small></span>
+  </a>
+  <div class="admin-topbar-actions">
+    <a class="admin-store-link" href="/">← Lihat toko</a>
+    <span class="admin-user">{{ current_user.name }}</span>
+    <form action="/auth/logout" method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+      <button class="admin-logout" type="submit">Keluar</button>
+    </form>
+  </div>
+</header>
+{% endblock %}
+
+{% block page_area %}
+<div class="admin-shell" id="main-content">
+  <nav class="admin-sidebar" aria-label="Navigasi admin">
+    <span class="admin-sidebar-label">MANAJEMEN TOKO</span>
+    {% for p, label in [('dashboard','Dashboard'),('products','Produk'),('categories','Kategori'),('inventory','Inventori'),('orders','Pesanan'),('payments','Pembayaran'),('promotions','Promosi'),('users','Pengguna'),('reviews','Ulasan'),('reports/sales','Laporan'),('audit-logs','Audit log')] %}
+    <a href="/admin/{{ p }}" class="{{ 'is-active' if active == p }}">
+      <span class="admin-nav-indicator" aria-hidden="true"></span>{{ label }}
+    </a>
+    {% endfor %}
+  </nav>
+  <main class="admin-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}<div class="flash {{ category }}" role="alert">{{ message }}</div>{% endfor %}
+    {% endwith %}
+    {% if error_message %}<div class="flash error" role="alert">{{ error_message }}</div>{% endif %}
+    {% block content %}
+    <div class="admin-page-content">{% block admin %}{% endblock %}</div>
+    {% endblock %}
+  </main>
+</div>
+{% endblock %}
+
+{% block site_footer %}
+<footer class="admin-footer"><span>shop id <b>ADMIN</b></span><span>Area pengelolaan toko</span></footer>
+{% endblock %}

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+  <defs><linearGradient id="bottle" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#d9e7c2"/><stop offset="1" stop-color="#78a06b"/></linearGradient></defs>
+  <ellipse cx="160" cy="211" rx="68" ry="12" fill="#204b3a" opacity=".12"/>
+  <path d="M143 48h34v24q18 10 20 30l8 96q1 13-13 13h-68q-14 0-13-13l8-96q2-20 20-30z" fill="url(#bottle)" stroke="#486c50" stroke-width="4"/>
+  <path d="M146 35h28v18h-28z" fill="#d9785e"/>
+  <path d="M121 111h78v50h-78z" fill="#fffdf3"/>
+  <path d="M147 147q-8-18 11-29 18 12 10 29-10 14-21 0" fill="#1f5a46"/>
+  <text x="160" y="128" fill="#28523b" font-family="Arial,sans-serif" font-size="10" font-weight="700" text-anchor="middle">SAMPO</text>
+  <text x="160" y="179" fill="#fffdf3" font-family="Arial,sans-serif" font-size="9" font-weight="700" text-anchor="middle">170 ml</text>
+</svg>

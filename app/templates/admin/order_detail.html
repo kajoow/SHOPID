@@ -1,0 +1,177 @@
+{% extends "admin_base.html" %}
+{% from "_macros.html" import rp, status %}
+{% block title %}Pesanan {{ order.order_number }} - Admin{% endblock %}
+
+{% block admin %}
+<div class="row">
+  <div>
+    <p><a href="/admin/orders" class="mut">← Kembali ke Daftar Pesanan</a></p>
+    <h1 style="margin:0">Pesanan {{ order.order_number }}</h1>
+    <p style="margin-top:4px">{{ status(order.order_status) }} {{ status(order.payment_status) }}</p>
+  </div>
+</div>
+
+<div class="two" style="margin-top:16px">
+  <div>
+    <!-- Detail Item -->
+    <div class="card scroll">
+      <h3 style="margin-top:0">Rincian Barang</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Produk</th>
+            <th>Harga Satuan</th>
+            <th>Jumlah</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order['items'] %}
+          <tr>
+            <td><code>{{ item.sku }}</code></td>
+            <td><strong>{{ item.name }}</strong></td>
+            <td>{{ rp(item.unit_price) }}</td>
+            <td>{{ item.quantity }}</td>
+            <td><strong>{{ rp(item.line_total) }}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Riwayat Status -->
+    <div class="card" style="margin-top:16px">
+      <h3 style="margin-top:0">Riwayat Status (Status History)</h3>
+      <ul style="padding-left:20px;margin-bottom:0">
+        {% for h in order.status_history %}
+        <li style="margin-bottom:8px">
+          <strong>{{ h.to.replace('_',' ').capitalize() if h.to else '-' }}</strong>
+          {% if h.from %}<span class="mut">(dari {{ h.from.replace('_',' ') }})</span>{% endif %}
+          <span class="mut">— {{ h.at|datetime if h.at else '-' }}</span>
+          {% if h.note %}<div style="font-size:0.9em;color:var(--mut)">Catatan: {{ h.note }}</div>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <aside>
+    <!-- Informasi Pembeli & Pengiriman -->
+    <div class="card">
+      <h3 style="margin-top:0">Penerima & Pengiriman</h3>
+      <p style="margin:4px 0"><strong>Penerima:</strong> {{ order.contact.name }}</p>
+      <p style="margin:4px 0"><strong>Telepon:</strong> {{ order.contact.phone }}</p>
+      <p style="margin:4px 0"><strong>Metode:</strong> <span class="tag">{{ order.fulfillment_method|upper }}</span></p>
+      {% if order.shipping_address %}
+      <p style="margin:4px 0"><strong>Alamat:</strong> {{ order.shipping_address.line }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Rincian Pembayaran -->
+    <div class="card sum" style="margin-top:16px">
+      <h3 style="margin-top:0">Pembayaran</h3>
+      <p style="margin:4px 0"><strong>Metode:</strong> {{ order.payment_method|upper }}</p>
+      <div><span>Subtotal:</span><span>{{ rp(order.subtotal) }}</span></div>
+      <div><span>Diskon:</span><span>-{{ rp(order.discount) }}</span></div>
+      <div><span>Ongkir:</span><span>{{ rp(order.delivery_fee) }}</span></div>
+      <div class="tot"><span>Total:</span><span>{{ rp(order.total) }}</span></div>
+
+      <!-- Bukti Transfer -->
+      {% if order.payment_proof %}
+      <div style="margin-top:12px;padding:8px;background:var(--bg);border-radius:4px">
+        <strong>Bukti Transfer:</strong>
+        <p style="margin:6px 0">
+          <a href="/orders/{{ order._id }}/payment-proof" target="_blank" class="btn sm">Lihat Bukti Foto</a>
+        </p>
+      </div>
+      {% endif %}
+
+      <!-- Aksi Verifikasi Pembayaran -->
+      {% if order.payment_status == 'awaiting_verification' %}
+      <div style="margin-top:12px;border-top:1px solid var(--b);padding-top:12px">
+        <h4>Verifikasi Pembayaran</h4>
+        <form method="post" action="/admin/orders/{{ order._id }}/payment" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+          <input type="hidden" name="action" value="verify">
+          <button class="btn sm">Verifikasi (Lunas)</button>
+        </form>
+        <button class="btn sm danger" onclick="document.getElementById('reject-form').style.display='block'">Tolak</button>
+
+        <form id="reject-form" method="post" action="/admin/orders/{{ order._id }}/payment" style="display:none;margin-top:8px">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+          <input type="hidden" name="action" value="reject">
+          <input type="text" name="note" placeholder="Alasan penolakan" required style="margin-bottom:6px">
+          <button class="btn sm danger">Konfirmasi Tolak</button>
+        </form>
+      </div>
+      {% elif order.payment_method == 'cod' and order.payment_status == 'unpaid' %}
+      <div style="margin-top:12px;border-top:1px solid var(--b);padding-top:12px">
+        <h4>Pembayaran Tunai (COD)</h4>
+        <form method="post" action="/admin/orders/{{ order._id }}/payment">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+          <input type="hidden" name="action" value="mark_cod_paid">
+          <button class="btn sm">Tandai COD Lunas</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Aksi Alur Status Order -->
+    {% if order.order_status not in ['completed', 'cancelled'] %}
+    <div class="card" style="margin-top:16px">
+      <h3 style="margin-top:0">Tindakan Order</h3>
+
+      {% if order.order_status == 'pending' %}
+      <form method="post" action="/admin/orders/{{ order._id }}/status" style="margin-bottom:8px">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+        <input type="hidden" name="status" value="confirmed">
+        <button class="btn" style="width:100%">Konfirmasi Pesanan</button>
+      </form>
+      {% elif order.order_status == 'confirmed' %}
+      <form method="post" action="/admin/orders/{{ order._id }}/status" style="margin-bottom:8px">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+        <input type="hidden" name="status" value="processing">
+        <button class="btn" style="width:100%" {% if order.payment_method == 'bank_transfer' and order.payment_status != 'paid' %}disabled title="Harus lunas terlebih dahulu"{% endif %}>
+          Mulai Proses (Processing)
+        </button>
+      </form>
+      {% if order.payment_method == 'bank_transfer' and order.payment_status != 'paid' %}
+      <p class="mut" style="font-size:0.85em;color:var(--bad)">* Transfer bank harus diverifikasi Lunas sebelum masuk tahap processing.</p>
+      {% endif %}
+      {% elif order.order_status == 'processing' %}
+      <form method="post" action="/admin/orders/{{ order._id }}/status" style="margin-bottom:8px">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+        <input type="hidden" name="status" value="ready_for_pickup">
+        <button class="btn" style="width:100%">Siap Diambil / Dikirim</button>
+      </form>
+      {% elif order.order_status == 'ready_for_pickup' %}
+      <form method="post" action="/admin/orders/{{ order._id }}/status" style="margin-bottom:8px">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+        <input type="hidden" name="status" value="completed">
+        <button class="btn" style="width:100%" {% if order.payment_status != 'paid' %}disabled title="Pembayaran harus lunas"{% endif %}>
+          Selesaikan Pesanan (Completed)
+        </button>
+      </form>
+      {% if order.payment_status != 'paid' %}
+      <p class="mut" style="font-size:0.85em;color:var(--bad)">* Pembayaran harus berstatus Lunas sebelum pesanan diselesaikan.</p>
+      {% endif %}
+      {% endif %}
+
+      <!-- Tombol Batal -->
+      <button class="btn sm danger ghost" style="width:100%;margin-top:8px" onclick="document.getElementById('admin-cancel-form').style.display='block'">
+        Batalkan Pesanan
+      </button>
+      <form id="admin-cancel-form" method="post" action="/admin/orders/{{ order._id }}/status" style="display:none;margin-top:8px">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+        <input type="hidden" name="status" value="cancelled">
+        <label for="cancel-note">Alasan Pembatalan:</label>
+        <input id="cancel-note" name="note" type="text" placeholder="Contoh: Stok rusak / dibatalkan" required style="margin-bottom:6px">
+        <button class="btn sm danger" style="width:100%">Konfirmasi Pembatalan & Pulihkan Stok</button>
+      </form>
+    </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}
+

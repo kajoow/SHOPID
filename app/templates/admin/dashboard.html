@@ -1,0 +1,4 @@
+{% extends "admin_base.html" %}{% from "_macros.html" import rp, status %}{% block title %}Dashboard admin{% endblock %}{% block admin %}
+<h1 style="margin-top:0">Dashboard</h1><div class="grid">{% for l,v in kpi %}<div class="card"><div class="mut">{{ l }}</div><div class="kpi">{{ v }}</div></div>{% endfor %}</div>
+<div class="two"><div><h2>Order menunggu tindakan</h2><div class="card scroll"><table><thead><tr><th>No. order</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody>{% for o in pending_orders %}<tr><td>{{ o.order_number }}</td><td>{{ rp(o.total) }}</td><td>{{ status(o.order_status) }}</td><td><a href="/admin/orders/{{ o._id }}">Buka</a></td></tr>{% endfor %}</tbody></table></div></div>
+<div><h2>Stok rendah</h2><div class="card">{% for p in low_stock %}<div class="row"><span>{{ p.name }}</span><span class="tag warn">{{ p.stock }} / min {{ p.min_stock }}</span></div>{% endfor %}</div></div></div>{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% from "_macros.html" import rp, status %}
+{% block title %}Pesanan saya{% endblock %}
+
+{% block content %}
+<div class="market-page orders-page">
+  <div class="market-breadcrumb"><a href="/">Beranda</a><span aria-hidden="true">/</span><span>Pesanan</span></div>
+  <header class="market-page-heading">
+    <div>
+      <span class="eyebrow">Aktivitas belanja</span>
+      <h1>Pesanan saya</h1>
+      <p class="mut">Lihat status dan detail pesananmu di sini.</p>
+    </div>
+    <a class="btn btn-outline" href="/products">Cari produk <span aria-hidden="true">→</span></a>
+  </header>
+
+  {% if orders %}
+  <div class="order-filters" role="group" aria-label="Filter pesanan">
+    <button class="is-active" type="button" data-order-filter="all" aria-pressed="true">Semua</button>
+    <button type="button" data-order-filter="active" aria-pressed="false">Sedang diproses</button>
+    <button type="button" data-order-filter="completed" aria-pressed="false">Selesai</button>
+    <button type="button" data-order-filter="cancelled" aria-pressed="false">Dibatalkan</button>
+  </div>
+  <div class="order-list">
+    {% for o in orders %}
+    <article class="order-card card" data-order-status="{{ o.order_status }}">
+      <div class="order-card-header">
+        <div class="order-store">
+          <strong>shop id</strong>
+          <span class="mut">{% if o.created_at %}{{ o.created_at|datetime }}{% else %}Pesanan{% endif %}</span>
+        </div>
+        <div class="order-number">
+          <span class="mut">No. pesanan</span>
+          <strong>{{ o.order_number }}</strong>
+        </div>
+        <div class="order-status">{{ status(o.order_status) }}</div>
+      </div>
+      <div class="order-card-body">
+        <div class="order-product-summary">
+          <span class="order-product-icon" aria-hidden="true">▦</span>
+          <div>
+            <strong>{{ o['items'][0].name if o['items'] else 'Pesanan shop id' }}</strong>
+            <span class="mut">{% if o['items']|length > 1 %}dan {{ o['items']|length - 1 }} produk lainnya · {% endif %}{{ o['items']|length }} produk</span>
+          </div>
+        </div>
+        <div class="order-payment"><span class="mut">Pembayaran</span>{{ status(o.payment_status) }}</div>
+        <div class="order-total"><span class="mut">Total belanja</span><strong>{{ rp(o.total) }}</strong></div>
+        <a class="btn sm" href="/orders/{{ o._id }}">Lihat detail <span aria-hidden="true">→</span></a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  <div class="market-empty card" id="orders-filter-empty" hidden>
+    <span class="empty-icon" aria-hidden="true">⌕</span>
+    <h2>Tidak ada pesanan di kategori ini</h2>
+    <p class="mut">Pilih filter lain untuk melihat pesananmu.</p>
+  </div>
+  {% else %}
+  <div class="market-empty card">
+    <span class="empty-icon" aria-hidden="true">▤</span>
+    <h2>Belum ada pesanan</h2>
+    <p class="mut">Pesanan yang kamu buat akan muncul di halaman ini.</p>
+    <a href="/products" class="btn">Mulai belanja</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

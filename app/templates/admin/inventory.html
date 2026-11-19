@@ -1,0 +1,130 @@
+{% extends "admin_base.html" %}
+{% from "_macros.html" import rp, stock_tag %}
+{% block title %}Manajemen Inventori - Admin{% endblock %}
+
+{% block admin %}
+<div class="row">
+  <h1 style="margin:0">Manajemen Inventori</h1>
+  <div>
+    <a href="/admin/inventory/movements" class="btn ghost">📋 Riwayat Mutasi Stok</a>
+  </div>
+</div>
+
+<!-- Filter dan Pencarian Inventori -->
+<div class="card" style="margin-top:16px">
+  <form method="get" action="/admin/inventory" class="row" style="gap:12px;flex-wrap:wrap">
+    <div style="flex:1;min-width:200px">
+      <label for="q">Cari Produk atau SKU</label>
+      <input id="q" name="q" type="text" value="{{ q }}" placeholder="Nama produk atau SKU...">
+    </div>
+    <div style="width:160px;align-self:flex-end">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" name="low_stock" value="true" {% if low_stock %}checked{% endif %}>
+        <span>Hanya Stok Rendah</span>
+      </label>
+    </div>
+    <div style="align-self:flex-end">
+      <button type="submit" class="btn">Filter</button>
+      <a href="/admin/inventory" class="btn ghost">Reset</a>
+    </div>
+  </form>
+</div>
+
+<!-- Modal / Form Penyesuaian Stok -->
+<div id="modal-adjust" class="card" style="display:none;margin-top:16px;border:2px solid var(--g)">
+  <div class="row">
+    <h3 style="margin:0" id="adjust-title">Penyesuaian Stok Produk</h3>
+    <button class="btn sm ghost" onclick="document.getElementById('modal-adjust').style.display='none'">✕ Tutup</button>
+  </div>
+  <form id="form-adjust" method="post" action="" style="margin-top:12px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+    <div class="two">
+      <div>
+        <label for="adj-product">Produk</label>
+        <input id="adj-product" type="text" readonly style="background:var(--bg)">
+        <label for="adj-type">Jenis Penyesuaian</label>
+        <select id="adj-type" name="type" onchange="toggleAdjustType(this.value)" required>
+          <option value="addition">Penambahan Stok (Restock)</option>
+          <option value="correction">Koreksi Stok (Stock Opname)</option>
+        </select>
+      </div>
+      <div>
+        <div id="field-addition">
+          <label for="adj-qty">Jumlah Tambahan (+)</label>
+          <input id="adj-qty" name="quantity" type="number" min="1" placeholder="Contoh: 50">
+        </div>
+        <div id="field-correction" style="display:none">
+          <label for="adj-new-stock">Jumlah Stok Fisik Hasil Opname</label>
+          <input id="adj-new-stock" name="new_stock" type="number" min="0" placeholder="Stok akhir aktual">
+        </div>
+        <label for="adj-note">Catatan / Alasan (Wajib untuk Koreksi Opname)</label>
+        <input id="adj-note" name="note" type="text" placeholder="Contoh: Restock supplier / Hasil hitung fisik">
+      </div>
+    </div>
+    <p style="margin-top:16px">
+      <button type="submit" class="btn">Simpan Penyesuaian</button>
+    </p>
+  </form>
+</div>
+
+<!-- Tabel Inventori -->
+<div class="card scroll" style="margin-top:16px">
+  <table>
+    <thead>
+      <tr>
+        <th>SKU</th>
+        <th>Nama Produk</th>
+        <th>Harga</th>
+        <th>Stok Saat Ini</th>
+        <th>Ambang Min.</th>
+        <th>Status</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in products %}
+      <tr>
+        <td><code>{{ p.sku }}</code></td>
+        <td><strong>{{ p.name }}</strong></td>
+        <td>{{ rp(p.price) }}</td>
+        <td><strong style="font-size:1.1em">{{ p.stock }}</strong></td>
+        <td>{{ p.min_stock }}</td>
+        <td>{{ stock_tag(p) }}</td>
+        <td>
+          <button class="btn sm" onclick="openAdjustModal('{{ p._id }}', '{{ p.name }}', {{ p.stock }})">
+            Sesuaikan Stok
+          </button>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="7" style="text-align:center;padding:24px">Tidak ada produk dalam inventori.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+function openAdjustModal(id, name, currentStock) {
+  document.getElementById('adjust-title').textContent = 'Penyesuaian Stok: ' + name + ' (Stok saat ini: ' + currentStock + ')';
+  document.getElementById('adj-product').value = name + ' (Sisa ' + currentStock + ')';
+  document.getElementById('form-adjust').action = '/admin/inventory/' + id + '/adjust';
+  document.getElementById('modal-adjust').style.display = 'block';
+  document.getElementById('modal-adjust').scrollIntoView({ behavior: 'smooth' });
+}
+
+function toggleAdjustType(type) {
+  if (type === 'correction') {
+    document.getElementById('field-addition').style.display = 'none';
+    document.getElementById('field-correction').style.display = 'block';
+    document.getElementById('adj-note').required = true;
+  } else {
+    document.getElementById('field-addition').style.display = 'block';
+    document.getElementById('field-correction').style.display = 'none';
+    document.getElementById('adj-note').required = false;
+  }
+}
+</script>
+{% endblock %}
+

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+  <defs><linearGradient id="bag" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#e98a55"/><stop offset="1" stop-color="#c94d37"/></linearGradient></defs>
+  <ellipse cx="160" cy="211" rx="89" ry="12" fill="#204b3a" opacity=".12"/>
+  <path d="m97 47 20 10h86l20-10-10 150-20 10h-66l-20-10z" fill="url(#bag)" stroke="#863d32" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M101 62h118v18H101z" fill="#f5e8c9"/>
+  <text x="160" y="75" fill="#285b45" font-family="Arial,sans-serif" font-size="10" font-weight="700" text-anchor="middle">SINGKONG</text>
+  <path d="M125 131q5-34 31-31 16 5 9 23 25-18 35 2 7 19-17 29-34 13-58-4" fill="#f5d17d" stroke="#a16b3f" stroke-width="4"/>
+  <path d="M136 125q15-8 26 2m4 10q13-8 23-1" fill="none" stroke="#fff0c7" stroke-width="4" stroke-linecap="round"/>
+  <text x="160" y="185" fill="#fff7df" font-family="Arial,sans-serif" font-size="10" font-weight="700" text-anchor="middle">BALADO</text>
+</svg>

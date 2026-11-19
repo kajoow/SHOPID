@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}Masuk{% endblock %}
+
+{% block content %}
+<form class="card auth" method="post">
+  <h1 style="margin-top:0">Masuk</h1>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+  {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+  {{ field('email','Email','email') }}
+  {{ field('password','Password','password') }}
+  <p><button class="btn" type="submit" style="width:100%">Masuk sebagai pelanggan</button></p>
+  <p class="mut">Belum punya akun? <a href="/auth/register">Daftar</a></p>
+  <div class="admin-login-entry"><span>Pengelola toko?</span><a href="/admin/login">Masuk melalui portal admin</a></div>
+</form>
+{% endblock %}

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+  <defs><linearGradient id="tube" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fffdf4"/><stop offset="1" stop-color="#bad2bd"/></linearGradient></defs>
+  <ellipse cx="160" cy="211" rx="92" ry="12" fill="#204b3a" opacity=".12"/>
+  <path d="M91 82q0-12 13-12h114q13 0 13 12l-15 110q-2 12-14 12h-82q-12 0-14-12z" fill="url(#tube)" stroke="#42694e" stroke-width="4"/>
+  <path d="M101 109h120l-5 41H96z" fill="#1f5a46"/>
+  <path d="M107 177h108l-3 17q-2 10-13 10h-79q-11 0-13-10z" fill="#d9785e"/>
+  <path d="M146 132q-15-16 0-29 17 12 0 29m0-11q-15-7-17 5 10 9 17-5" fill="#d9785e"/>
+  <text x="161" y="169" fill="#fffdf3" font-family="Arial,sans-serif" font-size="10" font-weight="700" text-anchor="middle">HERBAL</text>
+  <text x="160" y="95" fill="#285b45" font-family="Arial,sans-serif" font-size="10" font-weight="700" text-anchor="middle">PASTA GIGI</text>
+</svg>

@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% from "_macros.html" import rp %}
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="market-page product-detail-page">
+  <div class="market-breadcrumb"><a href="/">Beranda</a><span aria-hidden="true">/</span><a href="/products">Katalog</a><span aria-hidden="true">/</span><span>{{ product.name }}</span></div>
+
+  <div class="product-detail-layout">
+    <div class="card product-detail-visual">
+      {% if product.image_url %}
+      <img src="{{ product.image_url }}" alt="{{ product.name }}">
+      {% else %}
+      <img class="product-illustration" src="{{ product.name|product_visual }}" alt="{{ product.name }}">
+      {% endif %}
+    </div>
+
+    <div class="card product-detail-info">
+      <span class="eyebrow">Detail produk</span>
+      <h1>{{ product.name }}</h1>
+      <p class="price">{{ rp(product.price) }}</p>
+      {% if product.stock == 0 %}
+      <p class="product-unavailable-line"><span class="product-unavailable">Produk tidak tersedia saat ini</span></p>
+      {% endif %}
+      <p>{{ product.description or 'Tidak ada deskripsi produk.' }}</p>
+      <div class="product-detail-actions">
+        <button class="btn" data-act="add" data-id="{{ product._id }}" {% if product.stock == 0 %}disabled{% endif %}>{% if product.stock == 0 %}Tidak tersedia{% else %}Tambah ke keranjang{% endif %}</button>
+        <button class="btn ghost" data-act="wish" data-id="{{ product._id }}">Simpan favorit</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="product-reviews">
+    <h2>Ulasan Pelanggan ({{ product.rating_count|default(0) }})</h2>
+
+    {% if product.rating_count|default(0, true)|int > 0 or eligible_order_id %}
+    <div class="card product-review-summary">
+      <div class="row">
+        <div>
+          {% if product.rating_count|default(0, true)|int > 0 %}
+          <span class="review-score">{{ "%.1f"|format(product.rating_avg|default(0.0)) }}</span>
+          <span class="mut"> / 5.0</span>
+          <div class="review-stars">
+            {% set avg_rounded = product.rating_avg|default(0)|round|int %}
+            {% for i in range(1, 6) %}
+              {% if i <= avg_rounded %}★{% else %}☆{% endif %}
+            {% endfor %}
+            <span class="mut">({{ product.rating_count|default(0) }} ulasan)</span>
+          </div>
+          {% else %}
+          <p class="mut">Belum ada ulasan. Bagikan pengalamanmu setelah pembelian.</p>
+          {% endif %}
+        </div>
+        {% if eligible_order_id %}
+        <button class="btn sm" onclick="toggleReviewForm()">+ Tulis Ulasan</button>
+        {% endif %}
+      </div>
+
+      {% if eligible_order_id %}
+      <div id="form-add-review" hidden>
+        <h3>Beri Ulasan Produk</h3>
+        <form id="review-form" onsubmit="submitReview(event)">
+          <input type="hidden" id="rev-order-id" value="{{ eligible_order_id }}">
+          <div>
+            <label for="rev-rating">Rating (Bintang)</label>
+            <select id="rev-rating">
+              <option value="5">★★★★★ (5 - Sangat Puas)</option>
+              <option value="4">★★★★☆ (4 - Puas)</option>
+              <option value="3">★★★☆☆ (3 - Cukup)</option>
+              <option value="2">★★☆☆☆ (2 - Kurang)</option>
+              <option value="1">★☆☆☆☆ (1 - Sangat Kecewa)</option>
+            </select>
+          </div>
+          <div>
+            <label for="rev-comment">Komentar / Pengalaman Anda</label>
+            <textarea id="rev-comment" rows="3" placeholder="Ceritakan pengalaman Anda menggunakan produk ini..."></textarea>
+          </div>
+          <button type="submit" class="btn sm">Kirim Ulasan</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="review-list">
+      {% for r in reviews %}
+      <article class="card">
+        <div class="row">
+          <div>
+            <strong>{{ r.user_name }}</strong>
+            <span class="review-stars">
+              {% for i in range(1, 6) %}
+                {% if i <= r.rating %}★{% else %}☆{% endif %}
+              {% endfor %}
+            </span>
+          </div>
+          <span class="mut">{{ r.created_at.strftime('%d %b %Y') if r.created_at else '-' }}</span>
+        </div>
+        {% if r.comment %}
+        <p>{{ r.comment }}</p>
+        {% else %}
+        <p class="mut"><em>Tidak ada komentar tertulis.</em></p>
+        {% endif %}
+      </article>
+      {% else %}
+      {% if not eligible_order_id %}
+      <div class="card review-empty">
+        <p class="mut">Belum ada ulasan untuk produk ini.</p>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if eligible_order_id %}
+  <script>
+  function toggleReviewForm() {
+    const form = document.getElementById('form-add-review');
+    form.hidden = !form.hidden;
+  }
+
+  async function submitReview(e) {
+    e.preventDefault();
+    const orderId = document.getElementById('rev-order-id').value;
+    const rating = parseInt(document.getElementById('rev-rating').value, 10);
+    const comment = document.getElementById('rev-comment').value.trim();
+
+    try {
+      await api('POST', '/products/{{ product._id }}/reviews', {
+        order_id: orderId,
+        rating: rating,
+        comment: comment
+      });
+      toast('Ulasan Anda berhasil dikirim!');
+      setTimeout(() => location.reload(), 600);
+    } catch (err) {
+      toast(err.message);
+    }
+  }
+  </script>
+  {% endif %}
+</div>
+{% endblock %}

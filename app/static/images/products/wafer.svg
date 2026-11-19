@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+  <defs><linearGradient id="pack" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#d9785e"/><stop offset="1" stop-color="#a84a34"/></linearGradient></defs>
+  <ellipse cx="160" cy="211" rx="86" ry="12" fill="#204b3a" opacity=".12"/>
+  <path d="m88 66 20-20h104l20 20-9 133H97z" fill="url(#pack)" stroke="#813e31" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M91 80h138v21H91z" fill="#fff4dd"/>
+  <text x="160" y="95" fill="#753a2b" font-family="Arial,sans-serif" font-size="12" font-weight="700" text-anchor="middle">WAFER COKELAT</text>
+  <path d="m125 129 16-12 16 12-16 13zm29 0 16-12 16 12-16 13zm-14 24 16-12 16 12-16 13z" fill="#e8c98f" stroke="#8a5a3d" stroke-width="3" stroke-linejoin="round"/>
+  <text x="160" y="187" fill="#fff4dd" font-family="Arial,sans-serif" font-size="10" font-weight="700" text-anchor="middle">150 g</text>
+</svg>

@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% block title %}Profil Saya{% endblock %}
+{% block content %}
+<div class="profile-page">
+  <header class="profile-heading">
+    <p class="profile-eyebrow">AKUN SHOP ID</p>
+    <h1>Ruang personal Anda</h1>
+    <p class="profile-subtitle">Atur detail akun dan preferensi belanja Anda dalam satu tempat.</p>
+  </header>
+
+  <div class="profile-layout">
+    <aside class="profile-sidebar" aria-label="Ringkasan akun">
+      <section class="profile-card profile-identity">
+        <div class="profile-avatar" aria-label="Foto profil">
+          <img
+            id="profile-avatar-preview"
+            src="{{ user.profile_image or '' }}"
+            alt="Foto profil {{ user.name }}"
+            {% if not user.profile_image %}hidden{% endif %}
+          >
+          <span id="profile-avatar-initial" aria-hidden="true" {% if user.profile_image %}hidden{% endif %}>{{ user.name[:1]|upper }}</span>
+        </div>
+        <p class="profile-member-label">AKUN PELANGGAN</p>
+        <h2>{{ user.name }}</h2>
+        <p class="profile-email">{{ user.email }}</p>
+
+        <form class="profile-photo-form" method="post" action="{{ url_for('user.upload_profile_photo') }}" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+          <label class="profile-file-label" for="profile-image-input">Pilih foto</label>
+          <input
+            class="sr-only"
+            id="profile-image-input"
+            name="profile_image"
+            type="file"
+            accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+            aria-describedby="profile-photo-help profile-photo-status"
+            required
+          >
+          <p class="profile-photo-help" id="profile-photo-help">JPG atau PNG, maksimal 2 MB.</p>
+          <p class="profile-photo-status" id="profile-photo-status" aria-live="polite"></p>
+          <button class="btn sm" type="submit">Unggah foto</button>
+        </form>
+
+        <div class="profile-completion">
+          <div class="profile-completion-heading">
+            <span>Kelengkapan profil</span>
+            <strong>{{ profile_completion }}%</strong>
+          </div>
+          <div
+            class="profile-progress-track"
+            role="progressbar"
+            aria-label="Kelengkapan profil"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="{{ profile_completion }}"
+          >
+            <span style="width: {{ profile_completion }}%"></span>
+          </div>
+          <p>Lengkapi detail akun agar proses belanja lebih praktis.</p>
+        </div>
+
+        <div class="profile-member-since">
+          <span>Bergabung sejak</span>
+          <strong>{{ user.created_at.strftime('%d %b %Y') if user.created_at else 'Member shop id' }}</strong>
+        </div>
+      </section>
+
+      <nav class="profile-card profile-shortcuts" aria-label="Akses cepat">
+        <p class="profile-card-kicker">AKSES CEPAT</p>
+        <a href="/orders/my"><span>Riwayat pesanan</span><span aria-hidden="true">→</span></a>
+        <a href="/wishlist"><span>Produk favorit</span><span aria-hidden="true">→</span></a>
+        <a href="/notifications"><span>Notifikasi</span><span aria-hidden="true">→</span></a>
+        <a href="/cart"><span>Keranjang belanja</span><span aria-hidden="true">→</span></a>
+      </nav>
+    </aside>
+
+    <div class="profile-content">
+      <section class="profile-card profile-form-card" id="personal-data">
+        <div class="profile-section-heading">
+          <div>
+            <p class="profile-card-kicker">INFORMASI AKUN</p>
+            <h2>Data diri</h2>
+            <p>Pastikan informasi kontak dan alamat Anda selalu terbaru.</p>
+          </div>
+          <span class="profile-section-index" aria-hidden="true">01</span>
+        </div>
+
+        <form id="profile-form" method="post" action="/profile">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+          <div class="profile-field-grid">
+            <div class="profile-field profile-field-full">
+              <label for="profile-email">Alamat email</label>
+              <input id="profile-email" type="email" value="{{ user.email }}" disabled>
+              <small>Email digunakan untuk masuk dan tidak dapat diubah.</small>
+            </div>
+            <div class="profile-field">
+              <label for="profile-name">Nama lengkap</label>
+              <input id="profile-name" name="name" type="text" value="{{ user.name }}" minlength="2" maxlength="100" autocomplete="name" required>
+            </div>
+            <div class="profile-field">
+              <label for="profile-phone">Nomor telepon</label>
+              <input id="profile-phone" name="phone" type="tel" value="{{ user.phone or '' }}" autocomplete="tel" placeholder="Contoh: 081234567890">
+            </div>
+            <div class="profile-field profile-field-full">
+              <label for="profile-address">Alamat pengiriman</label>
+              <textarea id="profile-address" name="address" rows="3" maxlength="300" autocomplete="street-address" placeholder="Tambahkan alamat yang biasa digunakan">{{ user.address or '' }}</textarea>
+            </div>
+          </div>
+          <div class="profile-form-footer">
+            <p>Perubahan hanya berlaku untuk akun Anda.</p>
+            <button type="submit" class="btn">Simpan perubahan</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="profile-card profile-security-card" id="account-security">
+        <div class="profile-section-heading">
+          <div>
+            <p class="profile-card-kicker">KEAMANAN</p>
+            <h2>Perbarui password</h2>
+            <p>Gunakan password yang kuat dan tidak dipakai di tempat lain.</p>
+          </div>
+          <span class="profile-section-index" aria-hidden="true">02</span>
+        </div>
+
+        <form class="profile-password-form" method="post" action="/profile/password">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+          <div class="profile-field">
+            <label for="current-password">Password saat ini</label>
+            <div class="profile-password-input">
+              <input id="current-password" name="current_password" type="password" autocomplete="current-password" required>
+              <button type="button" class="profile-password-toggle" data-password-toggle="current-password" aria-pressed="false">Tampilkan</button>
+            </div>
+          </div>
+          <div class="profile-password-grid">
+            <div class="profile-field">
+              <label for="new-password">Password baru</label>
+              <div class="profile-password-input">
+                <input id="new-password" name="new_password" type="password" minlength="8" autocomplete="new-password" required>
+                <button type="button" class="profile-password-toggle" data-password-toggle="new-password" aria-pressed="false">Tampilkan</button>
+              </div>
+            </div>
+            <div class="profile-field">
+              <label for="confirm-password">Ulangi password baru</label>
+              <div class="profile-password-input">
+                <input id="confirm-password" name="confirm_password" type="password" minlength="8" autocomplete="new-password" required>
+                <button type="button" class="profile-password-toggle" data-password-toggle="confirm-password" aria-pressed="false">Tampilkan</button>
+              </div>
+            </div>
+          </div>
+          <div class="profile-form-footer">
+            <p>Minimal 8 karakter, terdiri dari huruf dan angka.</p>
+            <button type="submit" class="btn ghost">Perbarui password</button>
+          </div>
+          <p class="profile-password-status" id="profile-password-status" aria-live="polite"></p>
+        </form>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+  const profileForm = document.getElementById("profile-form");
+  profileForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    try {
+      await api("PATCH", "/profile", {
+        name: form.querySelector('[name="name"]').value,
+        phone: form.querySelector('[name="phone"]').value,
+        address: form.querySelector('[name="address"]').value
+      });
+      toast("Profil berhasil diperbarui");
+    } catch (error) {
+      toast(error.message);
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+
+  const photoInput = document.getElementById("profile-image-input");
+  const photoStatus = document.getElementById("profile-photo-status");
+  photoInput.addEventListener("change", function () {
+    const file = photoInput.files[0];
+    if (!file) return;
+    if (!["image/jpeg", "image/png"].includes(file.type)) {
+      photoInput.value = "";
+      photoStatus.textContent = "Pilih file JPG atau PNG.";
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      photoInput.value = "";
+      photoStatus.textContent = "Ukuran foto melebihi batas 2 MB.";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function () {
+      document.getElementById("profile-avatar-preview").src = reader.result;
+      document.getElementById("profile-avatar-preview").hidden = false;
+      document.getElementById("profile-avatar-initial").hidden = true;
+      photoStatus.textContent = "Pratinjau foto siap. Unggah untuk menyimpan perubahan.";
+    };
+    reader.onerror = function () {
+      photoStatus.textContent = "Foto tidak dapat dibaca. Coba pilih file lain.";
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.querySelectorAll("[data-password-toggle]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      const password = document.getElementById(button.dataset.passwordToggle);
+      const isVisible = password.type === "text";
+      password.type = isVisible ? "password" : "text";
+      button.textContent = isVisible ? "Tampilkan" : "Sembunyikan";
+      button.setAttribute("aria-pressed", String(!isVisible));
+    });
+  });
+
+  document.querySelector(".profile-password-form").addEventListener("submit", function (event) {
+    const newPassword = document.getElementById("new-password");
+    const confirmation = document.getElementById("confirm-password");
+    const status = document.getElementById("profile-password-status");
+    if (newPassword.value !== confirmation.value) {
+      event.preventDefault();
+      status.textContent = "Konfirmasi password belum sama.";
+      confirmation.focus();
+      return;
+    }
+    status.textContent = "";
+  });
+</script>
+{% endblock %}

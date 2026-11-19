@@ -1,0 +1,60 @@
+{% extends "admin_base.html" %}
+{% block title %}Audit Log Sistem - Admin{% endblock %}
+
+{% block admin %}
+<div class="row">
+  <h1 style="margin:0">Log Audit Sistem (Audit Trail)</h1>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <form method="get" action="/admin/audit-logs" class="row" style="gap:12px">
+    <div>
+      <label for="action">Filter Tindakan (Action)</label>
+      <input id="action" name="action" type="text" value="{{ action }}" placeholder="Contoh: order.cancel">
+    </div>
+    <div>
+      <label for="entity_type">Tipe Entitas</label>
+      <input id="entity_type" name="entity_type" type="text" value="{{ entity_type }}" placeholder="orders, products, users...">
+    </div>
+    <div style="align-self:flex-end">
+      <button type="submit" class="btn">Filter</button>
+      <a href="/admin/audit-logs" class="btn ghost">Reset</a>
+    </div>
+  </form>
+</div>
+
+<div class="card scroll" style="margin-top:16px">
+  <table>
+    <thead>
+      <tr>
+        <th>Waktu (WIB)</th>
+        <th>Pelaku</th>
+        <th>Tindakan (Action)</th>
+        <th>Entitas</th>
+        <th>ID Target</th>
+        <th>Perubahan (Sebelum → Sesudah)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for l in logs %}
+      <tr>
+        <td>{{ l.created_at|datetime if l.created_at else '-' }}</td>
+        <td>{{ l.actor_name }} <span class="mut">({{ l.actor_email }})</span></td>
+        <td><span class="tag info">{{ l.action }}</span></td>
+        <td><code>{{ l.entity_type }}</code></td>
+        <td><span class="mut">{{ l.entity_id }}</span></td>
+        <td style="font-size:0.85em">
+          {% if l.before %}<div><strong class="mut">Sebelum:</strong> {{ l.before }}</div>{% endif %}
+          {% if l.after %}<div><strong class="mut">Sesudah:</strong> {{ l.after }}</div>{% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="6" style="text-align:center;padding:24px">Belum ada catatan log audit.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+

@@ -1,0 +1,104 @@
+{% extends "admin_base.html" %}
+{% block title %}Moderasi Review{% endblock %}
+
+{% block admin %}
+<div class="row">
+  <h1 style="margin:0">Moderasi Review</h1>
+  <span class="mut">{{ total }} review</span>
+</div>
+
+<!-- Filter Visibilitas -->
+<div class="card" style="margin-top:16px">
+  <form method="get" action="/admin/reviews" class="row" style="gap:12px;flex-wrap:wrap">
+    <select name="is_visible" style="width:auto">
+      <option value="">Semua Status</option>
+      <option value="1" {{ 'selected' if is_visible=='1' }}>Tampil</option>
+      <option value="0" {{ 'selected' if is_visible=='0' }}>Tersembunyi</option>
+    </select>
+    <button type="submit" class="btn sm">Filter</button>
+    {% if is_visible %}
+    <a href="/admin/reviews" class="btn sm ghost">Reset</a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="card scroll" style="margin-top:16px">
+  <table>
+    <thead>
+      <tr>
+        <th>Produk</th>
+        <th>Pengguna</th>
+        <th>Rating</th>
+        <th>Komentar</th>
+        <th>Status</th>
+        <th>Tanggal</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reviews %}
+      <tr>
+        <td><strong>{{ r.product_name }}</strong></td>
+        <td>{{ r.user_name }}</td>
+        <td>
+          {% for i in range(1, 6) %}
+            {% if i <= r.rating %}★{% else %}☆{% endif %}
+          {% endfor %}
+          <span class="mut">({{ r.rating }})</span>
+        </td>
+        <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+          {{ r.comment or '-' }}
+        </td>
+        <td>
+          {% if r.is_visible %}
+          <span class="tag">Tampil</span>
+          {% else %}
+          <span class="tag bad">Tersembunyi</span>
+          {% endif %}
+        </td>
+        <td>{{ r.created_at.strftime('%d/%m/%Y') if r.created_at else '-' }}</td>
+        <td>
+          {% if r.is_visible %}
+          <button class="btn sm danger" onclick="toggleReview('{{ r._id }}', false)">Sembunyikan</button>
+          {% else %}
+          <button class="btn sm" onclick="toggleReview('{{ r._id }}', true)">Tampilkan</button>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="7">Belum ada review.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+{% if total_pages > 1 %}
+<div class="row" style="margin-top:16px;justify-content:center;gap:8px">
+  {% if page > 1 %}
+  <a href="?is_visible={{ is_visible }}&page={{ page - 1 }}" class="btn sm ghost">← Sebelumnya</a>
+  {% endif %}
+  <span class="mut">Halaman {{ page }} dari {{ total_pages }}</span>
+  {% if page < total_pages %}
+  <a href="?is_visible={{ is_visible }}&page={{ page + 1 }}" class="btn sm ghost">Berikutnya →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+<script>
+async function toggleReview(id, show) {
+  const label = show ? 'menampilkan' : 'menyembunyikan';
+  if (!confirm('Yakin ingin ' + label + ' review ini?')) return;
+  try {
+    await api('PATCH', '/admin/reviews/' + id, { is_visible: show });
+    toast('Review berhasil di' + (show ? 'tampilkan' : 'sembunyikan'));
+    location.reload();
+  } catch (err) {
+    toast(err.message);
+  }
+}
+</script>
+{% endblock %}
+

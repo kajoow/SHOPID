@@ -1,0 +1,85 @@
+{% extends "admin_base.html" %}
+{% from "_macros.html" import rp, status %}
+{% block title %}Kelola Pesanan - Admin{% endblock %}
+
+{% block admin %}
+<div class="row">
+  <h1 style="margin:0">Daftar Pesanan</h1>
+</div>
+
+<!-- Form Filter & Pencarian -->
+<div class="card" style="margin-top:16px">
+  <form method="get" action="/admin/orders" class="row" style="gap:12px;flex-wrap:wrap">
+    <div style="flex:1;min-width:180px">
+      <label for="q">Cari No. Order / Penerima</label>
+      <input id="q" name="q" type="text" value="{{ q }}" placeholder="Contoh: RB-20261116...">
+    </div>
+    <div style="width:160px">
+      <label for="status">Status Order</label>
+      <select id="status" name="status">
+        <option value="">Semua Status</option>
+        {% for s in ['pending','confirmed','processing','ready_for_pickup','completed','cancelled'] %}
+        <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s.replace('_',' ') }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="width:160px">
+      <label for="payment_status">Status Bayar</label>
+      <select id="payment_status" name="payment_status">
+        <option value="">Semua Pembayaran</option>
+        {% for ps in ['unpaid','awaiting_verification','paid','failed','refunded'] %}
+        <option value="{{ ps }}" {% if payment_status == ps %}selected{% endif %}>{{ ps.replace('_',' ') }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="width:140px">
+      <label for="from">Dari Tanggal</label>
+      <input id="from" name="from" type="date" value="{{ from_date }}">
+    </div>
+    <div style="width:140px">
+      <label for="to">Sampai Tanggal</label>
+      <input id="to" name="to" type="date" value="{{ to_date }}">
+    </div>
+    <div style="align-self:flex-end">
+      <button type="submit" class="btn">Filter</button>
+      <a href="/admin/orders" class="btn ghost">Reset</a>
+    </div>
+  </form>
+</div>
+
+<div class="card scroll" style="margin-top:16px">
+  <table>
+    <thead>
+      <tr>
+        <th>No. Order</th>
+        <th>Waktu (WIB)</th>
+        <th>Penerima</th>
+        <th>Total</th>
+        <th>Status Order</th>
+        <th>Pembayaran</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in orders %}
+      <tr>
+        <td><strong>{{ o.order_number }}</strong></td>
+        <td>{{ o.created_at|datetime if o.created_at else '-' }}</td>
+        <td>{{ o.contact.name }} ({{ o.contact.phone }})</td>
+        <td><strong>{{ rp(o.total) }}</strong></td>
+        <td>{{ status(o.order_status) }}</td>
+        <td>{{ status(o.payment_status) }} ({{ o.payment_method }})</td>
+        <td>
+          <a href="/admin/orders/{{ o._id }}" class="btn sm">Kelola</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="7" style="text-align:center;padding:24px">Tidak ada pesanan yang sesuai filter.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+

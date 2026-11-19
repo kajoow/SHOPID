@@ -1,0 +1,29 @@
+{% macro rp(n) %}Rp {{ '{:,.0f}'.format(n).replace(',', '.') }}{% endmacro %}
+{% macro stock_tag(p) %}{% if p.stock == 0 %}<span class="tag bad">Habis</span>{% elif p.stock <= p.min_stock %}<span class="tag warn">Stok terbatas</span>{% else %}<span class="tag">Tersedia</span>{% endif %}{% endmacro %}
+{% macro status(s) %}{% set c = {'pending':'','confirmed':'info','processing':'warn','ready_for_pickup':'','completed':'','cancelled':'bad','unpaid':'warn','awaiting_verification':'info','paid':'','failed':'bad','refunded':'bad'} %}<span class="tag {{ c.get(s,'') }}">{{ s.replace('_',' ') }}</span>{% endmacro %}
+{% macro pcard(p, category_slug='') %}
+<article class="card pc" {% if category_slug %}data-category="{{ category_slug }}"{% endif %}>
+  <a class="product-card-image" href="/products/{{ p._id }}">
+    {% if p.image_url %}
+    <img class="product-photo" src="{{ p.image_url }}" alt="{{ p.name }}" loading="lazy">
+    {% else %}
+    <img class="product-photo product-illustration" src="{{ p.name|product_visual }}" alt="{{ p.name }}" loading="lazy">
+    {% endif %}
+    {% if p.stock == 0 %}
+    <span class="product-card-unavailable">Tidak tersedia</span>
+    {% endif %}
+  </a>
+  <a href="/products/{{ p._id }}"><strong>{{ p.name }}</strong></a>
+  {% set rating_count = p.rating_count|default(0, true)|int %}
+  {% if rating_count > 0 %}
+  <span class="product-card-rating" aria-label="Rating {{ '%.1f'|format(p.rating_avg|default(0, true)|float) }} dari 5 berdasarkan {{ rating_count }} ulasan">
+    <span aria-hidden="true">★</span>
+    <strong>{{ "%.1f"|format(p.rating_avg|default(0, true)|float) }}</strong>
+    <span>({{ rating_count }} ulasan)</span>
+  </span>
+  {% endif %}
+  <span class="price">{{ rp(p.price) }}</span>
+  <button class="btn sm" data-act="add" data-id="{{ p._id }}" {% if p.stock == 0 %}disabled{% endif %}>{% if p.stock == 0 %}Tidak tersedia{% else %}Tambah ke keranjang{% endif %}</button>
+</article>
+{% endmacro %}
+{% macro field(name, label, type='text', value='', err='') %}<label for="{{ name }}">{{ label }}</label><input id="{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ value }}">{% if err %}<div class="err">{{ err }}</div>{% endif %}{% endmacro %}

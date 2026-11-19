@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+  <defs><linearGradient id="bag" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#f8f2d9"/><stop offset="1" stop-color="#c5ddca"/></linearGradient></defs>
+  <ellipse cx="160" cy="211" rx="92" ry="13" fill="#204b3a" opacity=".12"/>
+  <path d="m92 62 22-22h92l22 22-10 137H102z" fill="url(#bag)" stroke="#285b45" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M94 69h130v22H94z" fill="#1f5a46"/>
+  <text x="159" y="84" fill="#fffdf3" font-family="Arial,sans-serif" font-size="13" font-weight="700" text-anchor="middle">BERSIH</text>
+  <circle cx="160" cy="133" r="31" fill="#fffdf3"/>
+  <path d="M143 137q17-28 34 0-17 20-34 0" fill="#d9785e"/>
+  <path d="M119 169h81" stroke="#537d62" stroke-linecap="round" stroke-width="5"/>
+  <text x="160" y="190" fill="#285b45" font-family="Arial,sans-serif" font-size="10" font-weight="700" text-anchor="middle">DETERJEN</text>
+</svg>

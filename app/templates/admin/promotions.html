@@ -1,0 +1,116 @@
+{% extends "admin_base.html" %}
+{% from "_macros.html" import rp %}
+{% block title %}Kelola Promosi - Admin{% endblock %}
+
+{% block admin %}
+<div class="row">
+  <h1 style="margin:0">Manajemen Voucher & Promosi</h1>
+  <button class="btn" onclick="document.getElementById('modal-add-promo').style.display='block'">+ Tambah Voucher</button>
+</div>
+
+<!-- Modal Tambah Voucher -->
+<div id="modal-add-promo" class="card" style="display:none;margin-top:16px;border:2px solid var(--g)">
+  <div class="row">
+    <h3 style="margin:0">Buat Voucher Baru</h3>
+    <button class="btn sm ghost" onclick="document.getElementById('modal-add-promo').style.display='none'">✕ Tutup</button>
+  </div>
+  <form method="post" action="/admin/promotions" style="margin-top:12px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+    <div class="two">
+      <div>
+        <label for="code">Kode Voucher (Unik, 4-20 Karakter)</label>
+        <input id="code" name="code" type="text" placeholder="Contoh: HEMAT10" required>
+
+        <label for="discount_type">Tipe Diskon</label>
+        <select id="discount_type" name="discount_type" required>
+          <option value="fixed">Nominal Tetap (Rp)</option>
+          <option value="percentage">Persentase (%)</option>
+        </select>
+
+        <label for="value">Nilai Diskon</label>
+        <input id="value" name="value" type="number" placeholder="Contoh: 10000 atau 10" required>
+      </div>
+      <div>
+        <label for="min_order">Minimal Belanja (Rp)</label>
+        <input id="min_order" name="min_order" type="number" value="0">
+
+        <label for="max_discount">Maksimal Potongan Diskon (Rp, opsional)</label>
+        <input id="max_discount" name="max_discount" type="number" placeholder="Khusus persentase">
+
+        <label for="quota">Kuota Pemakaian</label>
+        <input id="quota" name="quota" type="number" value="100" min="1" required>
+      </div>
+    </div>
+    <p style="margin-top:16px">
+      <button type="submit" class="btn">Simpan Voucher</button>
+    </p>
+  </form>
+</div>
+
+<div class="card scroll" style="margin-top:16px">
+  <table>
+    <thead>
+      <tr>
+        <th>Kode</th>
+        <th>Tipe</th>
+        <th>Nilai</th>
+        <th>Min. Belanja</th>
+        <th>Kuota Terpakai</th>
+        <th>Status</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pr in promotions %}
+      <tr>
+        <td><code><strong>{{ pr.code }}</strong></code></td>
+        <td><span class="tag">{{ pr.discount_type }}</span></td>
+        <td>
+          {% if pr.discount_type == 'fixed' %}
+            {{ rp(pr.value) }}
+          {% else %}
+            {{ pr.value }}%
+          {% endif %}
+        </td>
+        <td>{{ rp(pr.min_order) }}</td>
+        <td>{{ pr.used_count }} / {{ pr.quota }}</td>
+        <td>
+          <span class="tag {% if pr.is_active and pr.used_count < pr.quota %}info{% else %}bad{% endif %}">
+            {{ 'Aktif' if pr.is_active and pr.used_count < pr.quota else 'Tidak Aktif' }}
+          </span>
+        </td>
+        <td>
+          {% if pr.is_active %}
+          <button class="btn sm danger ghost" onclick="deactivatePromo('{{ pr._id }}')">Nonaktifkan</button>
+          {% else %}
+          <span class="mut">-</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="7" style="text-align:center;padding:24px">Belum ada voucher promosi.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+function deactivatePromo(id) {
+  if (confirm('Nonaktifkan voucher ini?')) {
+    fetch('/admin/promotions/' + id, {
+      method: 'DELETE',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}',
+        'Accept': 'application/json'
+      }
+    }).then(r => r.json()).then(data => {
+      if (data.ok) location.reload();
+      else alert(data.error ? data.error.message : 'Gagal');
+    });
+  }
+}
+</script>
+{% endblock %}
+

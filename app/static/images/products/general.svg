@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+  <defs><linearGradient id="bag" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fffdf4"/><stop offset="1" stop-color="#d4e2d4"/></linearGradient></defs>
+  <ellipse cx="160" cy="210" rx="84" ry="12" fill="#204b3a" opacity=".12"/>
+  <path d="m99 77 18-21h86l18 21-10 124h-102z" fill="url(#bag)" stroke="#42694e" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M110 101h100v17H110z" fill="#1f5a46"/>
+  <path d="M140 151h40" stroke="#d9785e" stroke-linecap="round" stroke-width="10"/>
+  <text x="160" y="93" fill="#fffdf3" font-family="Arial,sans-serif" font-size="10" font-weight="700" text-anchor="middle">SHOP ID</text>
+  <text x="160" y="183" fill="#285b45" font-family="Arial,sans-serif" font-size="10" font-weight="700" text-anchor="middle">PRODUK PILIHAN</text>
+</svg>

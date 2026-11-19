@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+  <defs><linearGradient id="tea" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#c88a47"/><stop offset="1" stop-color="#754329"/></linearGradient></defs>
+  <ellipse cx="160" cy="211" rx="63" ry="11" fill="#204b3a" opacity=".12"/>
+  <path d="M143 39h34v23l13 17 10 114q1 14-13 14h-54q-14 0-13-14l10-114 13-17z" fill="url(#tea)" stroke="#65402c" stroke-width="4"/>
+  <path d="M145 35h30v15h-30z" fill="#d9785e"/>
+  <path d="M131 110h58v43h-58z" fill="#f4e9cf"/>
+  <path d="M147 139q13-20 27 0-14 14-27 0" fill="#1f5a46"/>
+  <text x="160" y="125" fill="#28523b" font-family="Arial,sans-serif" font-size="10" font-weight="700" text-anchor="middle">TEH</text>
+  <text x="160" y="177" fill="#fff2d6" font-family="Arial,sans-serif" font-size="9" font-weight="700" text-anchor="middle">350 ml</text>
+</svg>

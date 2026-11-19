@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+  <defs><linearGradient id="jar" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#f0d59a"/><stop offset="1" stop-color="#bd8747"/></linearGradient></defs>
+  <ellipse cx="160" cy="211" rx="75" ry="11" fill="#204b3a" opacity=".12"/>
+  <path d="M111 62q0-12 12-12h74q12 0 12 12v120q0 17-17 17h-64q-17 0-17-17z" fill="url(#jar)" stroke="#775638" stroke-width="4"/>
+  <path d="M106 52h108v18H106z" rx="5" fill="#1f5a46"/>
+  <path d="M130 112q-10-14 2-23 13-6 18 10 8-11 19-4 12 10 0 23-10 11-22 0-10 14-21 4-10-5-3-10m54 20q-8-14 3-20 13-5 17 10 9-9 18-1 8 9-3 19-10 9-20 0-10 11-19 2" fill="#d3a05b" stroke="#8d6336" stroke-width="3"/>
+  <text x="160" y="166" fill="#fff7df" font-family="Arial,sans-serif" font-size="11" font-weight="700" text-anchor="middle">KACANG</text>
+  <text x="160" y="183" fill="#694d31" font-family="Arial,sans-serif" font-size="9" text-anchor="middle">PANGGANG 100 g</text>
+</svg>

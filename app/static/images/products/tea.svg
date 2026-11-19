@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+  <defs><linearGradient id="box" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#f4e6bb"/><stop offset="1" stop-color="#d5aa64"/></linearGradient></defs>
+  <ellipse cx="160" cy="211" rx="78" ry="12" fill="#204b3a" opacity=".12"/>
+  <path d="m108 55 38-20h76v157H108z" fill="url(#box)" stroke="#6b5938" stroke-width="4" stroke-linejoin="round"/>
+  <path d="m108 55 38-20v157l-38 0z" fill="#e9d8ad"/>
+  <rect x="131" y="78" width="70" height="74" rx="34" fill="#1f5a46"/>
+  <path d="M164 131q-18-22 0-38 19 16 0 38m0-16q-21-9-24 8 15 13 24-8" fill="#e5c986"/>
+  <text x="166" y="171" fill="#4a412e" font-family="Arial,sans-serif" font-size="12" font-weight="700" text-anchor="middle">TEH CELUP</text>
+  <text x="166" y="188" fill="#6b5938" font-family="Arial,sans-serif" font-size="9" text-anchor="middle">25 KANTONG</text>
+</svg>

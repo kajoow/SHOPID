@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% from "_macros.html" import pcard %}
+{% block title %}Katalog{% endblock %}
+
+{% block content %}
+<div class="market-page catalog-page">
+  <div class="market-breadcrumb"><a href="/">Beranda</a><span aria-hidden="true">/</span><span>Katalog</span></div>
+  <header class="market-page-heading">
+    <div>
+      <span class="eyebrow">Jelajahi shop id</span>
+      <h1>Cari produk favoritmu</h1>
+      <p class="mut">Harga dan stok mengikuti data katalog toko saat ini.</p>
+    </div>
+    <div class="market-result-count"><strong>{{ total_count }}</strong><span>produk dalam katalog</span></div>
+  </header>
+
+  <nav class="catalog-categories" aria-label="Kategori produk">
+    <a class="{{ 'is-active' if not request.args.get('category') }}" href="/products">Semua</a>
+    {% for c in categories %}
+    <a class="{{ 'is-active' if request.args.get('category') == c.slug }}" href="/products?category={{ c.slug }}">{{ c.name }}</a>
+    {% endfor %}
+  </nav>
+
+  <div class="catalog-layout">
+    <form class="catalog-filter card" method="get">
+      <div class="filter-heading"><strong>Filter produk</strong><a href="/products">Reset</a></div>
+      {% if request.args.get('q') %}<input type="hidden" name="q" value="{{ request.args.get('q') }}">{% endif %}
+      <label for="category">Kategori</label>
+      <select id="category" name="category">
+        <option value="">Semua kategori</option>
+        {% for c in categories %}
+        <option value="{{ c.slug }}" {{ 'selected' if request.args.get('category') == c.slug }}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+
+      <fieldset class="price-filter">
+        <legend>Rentang harga</legend>
+        <div class="price-inputs">
+          <label class="sr-only" for="min_price">Harga minimum</label>
+          <input id="min_price" name="min_price" type="number" min="0" placeholder="Minimum" value="{{ request.args.get('min_price','') }}">
+          <span aria-hidden="true">—</span>
+          <label class="sr-only" for="max_price">Harga maksimum</label>
+          <input id="max_price" name="max_price" type="number" min="0" placeholder="Maksimum" value="{{ request.args.get('max_price','') }}">
+        </div>
+      </fieldset>
+
+      <label for="sort">Urutkan produk</label>
+      <select id="sort" name="sort">
+        <option value="">Terbaru</option>
+        <option value="price_asc" {{ 'selected' if request.args.get('sort') == 'price_asc' }}>Harga terendah</option>
+        <option value="price_desc" {{ 'selected' if request.args.get('sort') == 'price_desc' }}>Harga tertinggi</option>
+        <option value="popular" {{ 'selected' if request.args.get('sort') == 'popular' }}>Terlaris</option>
+      </select>
+      <button class="btn filter-submit" type="submit">Terapkan filter</button>
+    </form>
+
+    <section class="catalog-results" aria-label="Hasil katalog">
+      <div class="catalog-toolbar">
+        <div>
+          <strong>{% if request.args.get('q') %}Hasil pencarian{% else %}Semua produk{% endif %}</strong>
+          {% if request.args.get('q') %}<span class="catalog-query">“{{ request.args.get('q') }}”</span>{% endif %}
+        </div>
+        <span class="mut">Menampilkan {{ products|length }} dari {{ total_count }} produk</span>
+      </div>
+
+      {% if products %}
+      <div class="grid catalog-grid">
+        {% for p in products %}{{ pcard(p) }}{% endfor %}
+      </div>
+      {% else %}
+      <div class="catalog-empty card">
+        <span class="empty-icon" aria-hidden="true">⌕</span>
+        <h2>Produk belum ditemukan</h2>
+        <p class="mut">Coba kata kunci lain atau ubah filter pencarianmu.</p>
+        <a class="btn" href="/products">Lihat semua produk</a>
+      </div>
+      {% endif %}
+
+      {% if total_pages > 1 %}
+      <nav class="catalog-pagination" aria-label="Halaman katalog">
+        {% if page > 1 %}
+        <a href="?{% for k, v in request.args.items() if k != 'page' %}{{ k }}={{ v }}&{% endfor %}page={{ page - 1 }}" class="btn ghost">← Sebelumnya</a>
+        {% else %}<span></span>{% endif %}
+        <span class="mut">Halaman <strong>{{ page }}</strong> dari {{ total_pages }}</span>
+        {% if page < total_pages %}
+        <a href="?{% for k, v in request.args.items() if k != 'page' %}{{ k }}={{ v }}&{% endfor %}page={{ page + 1 }}" class="btn ghost">Berikutnya →</a>
+        {% else %}<span></span>{% endif %}
+      </nav>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

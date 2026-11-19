@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+  <defs><linearGradient id="pack" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#8a5a3d"/><stop offset="1" stop-color="#3b2b26"/></linearGradient></defs>
+  <ellipse cx="160" cy="211" rx="83" ry="12" fill="#204b3a" opacity=".12"/>
+  <path d="m103 56 15-17h84l15 17-9 144h-96z" fill="url(#pack)" stroke="#392821" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M106 68h108v17H106z" fill="#d9785e"/>
+  <text x="160" y="81" fill="#fffdf3" font-family="Arial,sans-serif" font-size="10" font-weight="700" text-anchor="middle">KOPI PILIHAN</text>
+  <path d="M129 141a31 31 0 1 1 62 0v12h-62z" fill="#e9d6bb"/>
+  <path d="M191 143h12a12 12 0 0 1 0 24h-13" fill="none" stroke="#e9d6bb" stroke-width="7"/>
+  <path d="M145 135q15-9 30 0" fill="none" stroke="#6b4634" stroke-width="5" stroke-linecap="round"/>
+  <text x="160" y="187" fill="#f7ead5" font-family="Arial,sans-serif" font-size="10" font-weight="700" text-anchor="middle">INSTAN 100 g</text>
+</svg>

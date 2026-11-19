@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% from "_macros.html" import field %}{% block title %}Daftar{% endblock %}{% block content %}
+<form class="card auth" method="post"><h1 style="margin-top:0">Buat akun</h1><input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+{{ field('name','Nama lengkap') }}{{ field('email','Email','email') }}{{ field('phone','Telepon (opsional)','tel') }}{{ field('password','Password','password') }}<p class="mut">Minimal 8 karakter, berisi huruf dan angka.</p>
+<p><button class="btn" style="width:100%">Daftar</button></p><p class="mut">Sudah punya akun? <a href="/auth/login">Masuk</a></p></form>{% endblock %}
