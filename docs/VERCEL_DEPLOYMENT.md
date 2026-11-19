@@ -5,6 +5,8 @@ Proyek ini memakai entrypoint Flask `run.py` dan mendaftarkannya secara eksplisi
 di `[project].dependencies` pada file yang sama. `requirements.txt` dipakai untuk
 instalasi lokal dan tes; jaga daftar dependensi runtime keduanya tetap selaras.
 Hubungkan repository dengan Root Directory di folder proyek ini.
+`vercel.json` menyertakan `app/templates/**` ke fungsi Python agar template yang
+dimuat Flask/Jinja saat runtime tersedia di deployment.
 
 ## Environment variables
 
