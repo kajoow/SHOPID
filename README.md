@@ -1,6 +1,6 @@
-# RetailBrain - Backend & Web E-Commerce Platform
+# ShopID - Backend & Web E-Commerce Platform
 
-Sistem backend aplikasi web e-commerce *RetailBrain* berbasis **Python (Flask)** dan **MongoDB**, dirancang khusus untuk memenuhi standar kehandalan tinggi, keamanan data, arsitektur bersih 6-layer, dan kepatuhan penuh terhadap *RetailBrain Complete System Blueprint v1.0*.
+Sistem backend aplikasi web e-commerce *SHOPID* berbasis **Python (Flask)** dan **MongoDB**, dirancang khusus untuk memenuhi standar kehandalan tinggi, keamanan data, arsitektur bersih 6-layer, dan kepatuhan penuh terhadap *shopid Complete System Blueprint v1.0*.
 
 ---
 
@@ -195,5 +195,6 @@ Untuk lingkungan produksi, jalankan aplikasi di balik WSGI server **Gunicorn** d
 | 13 | Laporan menampilkan data database nyata | TC-RP-01..02 (Asia/Jakarta) | MVP | **Terpenuhi (Lulus)** |
 | 14 | Modul tambahan berfungsi (Voucher, Wishlist, Review, Notif) | TC-VC, TC-WL, TC-RV, TC-RP-03 | Tambahan | **Terpenuhi (Lulus)** |
 
-#   S H O P I D  
+#   S H O P I D 
+ 
  
