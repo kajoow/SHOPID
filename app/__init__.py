@@ -38,7 +38,12 @@ class AnonymousUser:
 
 
 def create_app(config_class=None):
-    app = Flask(__name__)
+    static_folder = None
+    if os.environ.get("VERCEL") != "1":
+        static_folder = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "public", "static")
+        )
+    app = Flask(__name__, static_folder=static_folder)
 
     # Custom JSON provider untuk serialisasi ObjectId & datetime
     app.json = MongoJSONProvider(app)
@@ -107,7 +112,7 @@ def create_app(config_class=None):
 
     @app.template_filter("product_visual")
     def product_visual_filter(name):
-        return url_for("static", filename=product_image_for(name))
+        return f"/static/{product_image_for(name)}"
 
     @app.template_filter("datetime")
     def datetime_filter(dt, fmt="%d %b %Y, %H:%M"):

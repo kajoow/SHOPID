@@ -37,8 +37,8 @@ Prinsip utama yang dipegang:
 | 12 | `app/templates/user/order_detail.html` | Detail & pelacakan pesanan: stepper linimasa, daftar snapshot item, upload bukti transfer, tombol batal order. |
 | 13 | `app/templates/admin/dashboard.html` | Dashboard KPI admin: penjualan selesai, order selesai, verifikasi tertunda, stok rendah, order menunggu tindakan. |
 | 14 | `app/templates/admin/table.html` | Template generik tabel admin untuk daftar modul dengan kolom & baris dinamis. |
-| 15 | `app/static/css/style.css` | Token CSS (warna hijau/navy/merah/kuning, dark mode media query, responsive grid, tabel, kartu, tombol, badge). |
-| 16 | `app/static/js/app.js` | Helper asynchronous `api(method, url, body)` dengan header `X-CSRFToken`, toast notification, dan event listener aksi keranjang/wishlist. |
+| 15 | `public/static/css/style.css` | Token CSS (warna hijau/navy/merah/kuning, dark mode media query, responsive grid, tabel, kartu, tombol, badge). |
+| 16 | `public/static/js/app.js` | Helper asynchronous `api(method, url, body)` dengan header `X-CSRFToken`, toast notification, dan event listener aksi keranjang/wishlist. |
 
 ---
 
@@ -190,7 +190,7 @@ Seluruh template baru yang akan dibangun pada fase-fase berikutnya wajib mematuh
 | Konfigurasi env & secret | `.env` belum ada | Dibuat `.env.example` & load env fail-fast di **Fase 1** |
 | CLI commands | Belum ada | `flask init-db`, `flask create-admin`, `flask seed-demo` di **Fase 1** |
 | Auth & RBAC | Mock di preview.py | Diimplementasikan dengan Argon2id + CSRF + session di **Fase 2** |
-| Template frontend starter | Siap di `RetailBrain_Frontend_Starter/rb` | Dipindahkan & diintegrasikan ke `app/templates` dan `app/static` di **Fase 1** |
+| Template frontend starter | Siap di `RetailBrain_Frontend_Starter/rb` | Dipindahkan & diintegrasikan ke `app/templates` dan `public/static` di **Fase 1** |
 
 ---
 
