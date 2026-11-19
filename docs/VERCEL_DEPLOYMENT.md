@@ -1,8 +1,10 @@
 # Deploy ke Vercel
 
 Proyek ini memakai entrypoint Flask `run.py` dan mendaftarkannya secara eksplisit di
-`pyproject.toml` sebagai `run:app`. Hubungkan repository dengan Root Directory di
-folder proyek ini; Vercel akan memasang dependensi dari `requirements.txt`.
+`pyproject.toml` sebagai `run:app`. Daftar dependensi runtime untuk Vercel berada
+di `[project].dependencies` pada file yang sama. `requirements.txt` dipakai untuk
+instalasi lokal dan tes; jaga daftar dependensi runtime keduanya tetap selaras.
+Hubungkan repository dengan Root Directory di folder proyek ini.
 
 ## Environment variables
 
